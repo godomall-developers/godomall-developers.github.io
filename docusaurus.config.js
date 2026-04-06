@@ -2,8 +2,8 @@ import {themes as prismThemes} from 'prism-react-renderer';
 
 /** @type {import('@docusaurus/types').Config} */
 const config = {
-  title: 'Godomall Developers',
-  tagline: 'Release Notes & Source Diff',
+  title: '고도몰 개발자 센터',
+  tagline: 'Godomall Developer Center',
   favicon: 'img/favicon.ico',
 
   future: {
@@ -86,27 +86,25 @@ const config = {
         respectPrefersColorScheme: true,
       },
       navbar: {
-        title: 'Godomall Developers',
+        title: '고도몰 개발자 센터',
         items: [
           {
-            to: '/release-notes-godo25',
-            label: '릴리즈노트(Godo25)',
+            type: 'dropdown',
+            label: '릴리즈노트',
             position: 'left',
+            items: [
+              {to: '/release-notes-godo25', label: 'Godo25'},
+              {to: '/release-notes-godo26', label: 'Godo26'},
+            ],
           },
           {
-            to: '/release-notes-godo26',
-            label: '릴리즈노트(Godo26)',
+            type: 'dropdown',
+            label: '소스 diff',
             position: 'left',
-          },
-          {
-            to: '/source-diff-godo25',
-            label: '소스 diff(Godo25)',
-            position: 'left',
-          },
-          {
-            to: '/source-diff-godo26',
-            label: '소스 diff(Godo26)',
-            position: 'left',
+            items: [
+              {to: '/source-diff-godo25', label: 'Godo25'},
+              {to: '/source-diff-godo26', label: 'Godo26'},
+            ],
           },
           {
             href: 'https://github.com/godomall-developers/godomall-developers.github.io',
@@ -117,7 +115,7 @@ const config = {
       },
       footer: {
         style: 'dark',
-        copyright: `Copyright © ${new Date().getFullYear()} NHN Commerce. Built with Docusaurus.`,
+        copyright: `Copyright © ${new Date().getFullYear()} NHN Commerce.`,
       },
       prism: {
         theme: prismThemes.github,
