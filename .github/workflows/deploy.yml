@@ -5,7 +5,7 @@ on:
     branches: [main]
 
 permissions:
-  contents: read
+  contents: write
   pages: write
   id-token: write
 
@@ -14,10 +14,65 @@ concurrency:
   cancel-in-progress: true
 
 jobs:
-  build:
+  process-release-notes:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v4
+
+      - name: Process RELEASE-NOTE and SOURCE-DIFF files
+        run: |
+          shopt -s nullglob
+          changed=false
+
+          # 릴리즈노트 처리
+          for file in RELEASE-NOTE-*.md; do
+            target=$(echo "$file" | sed 's/RELEASE-NOTE-\(.*\)\.md/\1/')
+            date=$(grep -oP '^## \K\d{4}-\d{2}-\d{2}' "$file" | head -1)
+            if [ -z "$date" ]; then date=$(date +%Y-%m-%d); fi
+
+            dest_dir="docs/release-notes-${target}"
+            dest_file="${dest_dir}/${date}.md"
+
+            if [ -d "$dest_dir" ]; then
+              { echo "---"; echo "title: \"${date} 릴리즈\""; echo "---"; echo ""; cat "$file"; } > "$dest_file"
+              rm "$file"
+              changed=true
+              echo "Processed: $file → $dest_file"
+            fi
+          done
+
+          # 소스 diff 처리
+          for file in SOURCE-DIFF-*.md; do
+            target=$(echo "$file" | sed 's/SOURCE-DIFF-\(.*\)\.md/\1/')
+            date=$(grep -oP '^## \K\d{4}-\d{2}-\d{2}' "$file" | head -1)
+            if [ -z "$date" ]; then date=$(date +%Y-%m-%d); fi
+
+            dest_dir="docs/source-diff-${target}"
+            dest_file="${dest_dir}/${date}.md"
+
+            if [ -d "$dest_dir" ]; then
+              { echo "---"; echo "title: \"${date} 소스 diff\""; echo "---"; echo ""; cat "$file"; } > "$dest_file"
+              rm "$file"
+              changed=true
+              echo "Processed: $file → $dest_file"
+            fi
+          done
+
+          if [ "$changed" = true ]; then
+            git config user.name "godomall-developers"
+            git config user.email "noreply@godomall-developers.github.io"
+            git add -A
+            git commit -m "docs: 문서 자동 정리 ($(date +%Y-%m-%d))"
+            git push
+          fi
+
+  build:
+    needs: process-release-notes
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          ref: main
 
       - uses: actions/setup-node@v4
         with:
