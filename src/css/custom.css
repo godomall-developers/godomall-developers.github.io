@@ -353,39 +353,51 @@ body:has(.diff-viewer) .container {
   border-color: #2a2a2a;
 }
 
-/* 삭제 행 — 빨간 배경 */
-[data-theme='dark'] .diff-viewer .d2h-del {
-  background-color: #4c1a1a;
+/* 삭제 행 — 빨간 배경 (td 룰보다 우선순위 높게) */
+[data-theme='dark'] .diff-viewer .d2h-diff-table td.d2h-del {
+  background-color: #5c2225;
 }
 
-[data-theme='dark'] .diff-viewer td.d2h-del .d2h-code-side-linenumber {
-  background-color: #5c2020;
+[data-theme='dark'] .diff-viewer .d2h-diff-table td.d2h-del .d2h-code-line-ctn {
+  background-color: #5c2225;
+  color: #eeb4b4;
+}
+
+[data-theme='dark'] .diff-viewer .d2h-diff-table td.d2h-del.d2h-code-side-linenumber {
+  background-color: #6b2a2a;
+  color: #cc9999;
   border-color: #2a2a2a;
 }
 
 /* 삭제 인라인(단어 단위) 강조 */
-[data-theme='dark'] .diff-viewer .d2h-del .d2h-code-line-ctn del,
-[data-theme='dark'] .diff-viewer .d2h-del .d2h-code-line-ctn .d2h-change {
-  background-color: #8b3030;
-  color: #ffd4d4;
+[data-theme='dark'] .diff-viewer .d2h-diff-table td.d2h-del .d2h-code-line-ctn del,
+[data-theme='dark'] .diff-viewer .d2h-diff-table td.d2h-del .d2h-code-line-ctn .d2h-change {
+  background-color: #a03535;
+  color: #ffc8c8;
   text-decoration: none;
 }
 
 /* 추가 행 — 초록 배경 */
-[data-theme='dark'] .diff-viewer .d2h-ins {
-  background-color: #1a3d1a;
+[data-theme='dark'] .diff-viewer .d2h-diff-table td.d2h-ins {
+  background-color: #1d4a2a;
 }
 
-[data-theme='dark'] .diff-viewer td.d2h-ins .d2h-code-side-linenumber {
-  background-color: #205c20;
+[data-theme='dark'] .diff-viewer .d2h-diff-table td.d2h-ins .d2h-code-line-ctn {
+  background-color: #1d4a2a;
+  color: #b4eeb4;
+}
+
+[data-theme='dark'] .diff-viewer .d2h-diff-table td.d2h-ins.d2h-code-side-linenumber {
+  background-color: #256b30;
+  color: #99cc99;
   border-color: #2a2a2a;
 }
 
 /* 추가 인라인(단어 단위) 강조 */
-[data-theme='dark'] .diff-viewer .d2h-ins .d2h-code-line-ctn ins,
-[data-theme='dark'] .diff-viewer .d2h-ins .d2h-code-line-ctn .d2h-change {
-  background-color: #2e7d2e;
-  color: #d4ffd4;
+[data-theme='dark'] .diff-viewer .d2h-diff-table td.d2h-ins .d2h-code-line-ctn ins,
+[data-theme='dark'] .diff-viewer .d2h-diff-table td.d2h-ins .d2h-code-line-ctn .d2h-change {
+  background-color: #3a8a3a;
+  color: #c8ffc8;
   text-decoration: none;
 }
 
