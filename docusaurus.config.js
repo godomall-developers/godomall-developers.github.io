@@ -2,6 +2,45 @@ import {themes as prismThemes} from 'prism-react-renderer';
 import fs from 'fs';
 import path from 'path';
 
+// ─── 소스 diff MD 파싱: 파일 목록 + diff 텍스트 추출 ──────────────────────────
+function parseSourceDiff(content) {
+  let fileCount = 0;
+  const files = [];
+  const diffs = {};
+
+  // 변경 파일 수
+  const countMatch = content.match(/변경 파일 수:\s*(\d+)개/);
+  if (countMatch) fileCount = parseInt(countMatch[1]);
+
+  // 파일 목록 테이블 | M | `path` |
+  const tableRowRe = /^\|\s*(M|A|D)\s*\|\s*`([^`]+)`\s*\|/gm;
+  let m;
+  while ((m = tableRowRe.exec(content)) !== null) {
+    files.push({ status: m[1], path: m[2] });
+  }
+
+  // ### 파일경로 + ```diff 블록 파싱
+  const sections = content.split(/^### /m).slice(1);
+  for (const section of sections) {
+    const firstLine = section.split('\n')[0].trim();
+    const diffMatch = section.match(/```diff\n([\s\S]*?)```/);
+    if (diffMatch) {
+      const existing = diffs[firstLine];
+      diffs[firstLine] = existing ? existing + '\n' + diffMatch[1] : diffMatch[1];
+    }
+  }
+
+  // 테이블이 없는 경우 diff 키에서 파일 목록 보완
+  if (files.length === 0) {
+    for (const p of Object.keys(diffs)) {
+      files.push({ status: 'M', path: p });
+    }
+    fileCount = files.length;
+  }
+
+  return { fileCount, files, diffs };
+}
+
 // ─── MD 파일에서 그룹(### 헤딩 + 항목) 파싱 ───────────────────────────────────
 function parseGroups(content) {
   const groups = [];
@@ -17,6 +56,54 @@ function parseGroups(content) {
   }
   if (cur) groups.push(cur);
   return groups;
+}
+
+// ─── 소스 diff 데이터 플러그인 + 라우트 생성 ───────────────────────────────────
+async function sourceDiffDataPlugin(context) {
+  return {
+    name: 'source-diff-data',
+    async loadContent() {
+      const versions = ['godo25', 'godo26'];
+      const data = {};
+      for (const version of versions) {
+        const dir = path.join(context.siteDir, 'docs', `source-diff-${version}`);
+        if (!fs.existsSync(dir)) { data[version] = []; continue; }
+        const files = fs.readdirSync(dir)
+          .filter(f => /^\d{4}-\d{2}-\d{2}\.md$/.test(f))
+          .sort().reverse();
+        data[version] = files.map(file => {
+          const date = file.replace('.md', '');
+          const content = fs.readFileSync(path.join(dir, file), 'utf-8');
+          return { date, version, ...parseSourceDiff(content) };
+        });
+      }
+      return data;
+    },
+    async contentLoaded({ content, actions }) {
+      const { addRoute, setGlobalData, createData } = actions;
+      // 인덱스 페이지용 요약 데이터
+      const summary = {};
+      for (const [v, dates] of Object.entries(content)) {
+        summary[v] = dates.map(d => d.date);
+      }
+      setGlobalData(summary);
+      // 날짜별 페이지 라우트 생성
+      for (const [version, dates] of Object.entries(content)) {
+        for (const dateData of dates) {
+          const dataPath = await createData(
+            `source-diff-${version}-${dateData.date}.json`,
+            JSON.stringify(dateData),
+          );
+          addRoute({
+            path: `/source-diff-${version}/${dateData.date}`,
+            component: '@site/src/components/SourceDiffPage',
+            modules: { pageData: dataPath },
+            exact: true,
+          });
+        }
+      }
+    },
+  };
 }
 
 // ─── 릴리즈노트 MD 자동 수집 플러그인 ─────────────────────────────────────────
@@ -110,26 +197,7 @@ const config = {
 
   plugins: [
     releaseNotesDataPlugin,
-    [
-      '@docusaurus/plugin-content-docs',
-      {
-        id: 'source-diff-godo25',
-        path: 'docs/source-diff-godo25',
-        routeBasePath: 'source-diff-godo25',
-        sidebarPath: './sidebars-auto.js',
-        sidebarItemsGenerator: reverseChronologicalSidebar,
-      },
-    ],
-    [
-      '@docusaurus/plugin-content-docs',
-      {
-        id: 'source-diff-godo26',
-        path: 'docs/source-diff-godo26',
-        routeBasePath: 'source-diff-godo26',
-        sidebarPath: './sidebars-auto.js',
-        sidebarItemsGenerator: reverseChronologicalSidebar,
-      },
-    ],
+    sourceDiffDataPlugin,
   ],
 
   presets: [
