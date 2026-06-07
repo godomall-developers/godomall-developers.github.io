@@ -1,123 +1,598 @@
-@import url('https://fonts.googleapis.com/css2?family=Noto+Sans+KR:wght@300;400;500;700&display=swap');
-
+/* ============================================================
+   NCUA 변수 폴백 — CDN 실제값 기준 (main.min.css 로드 실패 시 사용)
+   주의: 이 값들은 CDN CSS 보다 나중에 로드되므로 CDN 값을 그대로 씀
+   ============================================================ */
 :root {
-  --ifm-color-primary: #2f3437;
-  --ifm-color-primary-dark: #282c2e;
-  --ifm-color-primary-darker: #25292b;
-  --ifm-color-primary-darkest: #1e2123;
-  --ifm-color-primary-light: #363c40;
-  --ifm-color-primary-lighter: #394043;
-  --ifm-color-primary-lightest: #404849;
-  --ifm-font-family-base: 'Noto Sans KR', -apple-system, BlinkMacSystemFont, sans-serif;
-  --ifm-heading-font-weight: 700;
-  --ifm-font-weight-bold: 500;
+  /* NCUA 실제 gray scale (Tailwind 아님, NHN Commerce 자체 값) */
+  --gray-50: #f6f7f9;
+  --gray-100: #eaecf0;
+  --gray-200: #d3d4d8;
+  --gray-300: #a4a5a8;
+  --gray-400: #757678;
+  --gray-500: #464748;
+  --gray-600: #2f2f30;
+  --gray-700: #171818;   /* 거의 검정 — 본문/헤딩 색 */
+  --base-white: #fff;
+  --shadow-xs: 0px 1px 2px 0px #1018280d;
+  --shadow-sm: 0px 1px 3px 0px #1018281a, 0px 1px 2px 0px #1018280f;
+  --shadow-md: 0px 4px 8px -2px #1018281a, 0px 2px 4px -2px #1018280f;
+  --pink-100: #fce7f6;
+  --pink-600: #c11574;
+  --violet-100: #ece9fe;
+  --violet-600: #5720b7;
+  --font-families-commerce-sans: "CommerceSans", "Noto Sans KR", "Apple SD Gothic Neo", sans-serif;
+
+  /* Docusaurus 변수 → 실제 NCUA 값으로 매핑 */
+  --ifm-color-primary: #171818;
+  --ifm-color-primary-dark: #0d0e0e;
+  --ifm-color-primary-darker: #080808;
+  --ifm-color-primary-darkest: #000;
+  --ifm-color-primary-light: #2f2f30;
+  --ifm-color-primary-lighter: #464748;
+  --ifm-color-primary-lightest: #757678;
+
+  --ifm-font-family-base: var(--font-families-commerce-sans);
+  --ifm-font-color-base: #171818;   /* gray-700 */
+  --ifm-heading-color: #171818;     /* gray-700 */
+  --ifm-background-color: var(--gray-50);
+  --ifm-font-size-base: 14px;
+  --ifm-line-height-base: 1.6;
+  --ifm-navbar-height: 60px;
+  --ifm-navbar-background-color: var(--base-white);
+  --ifm-navbar-shadow: 0 1px 0 var(--gray-100);
+  --ifm-link-color: #171818;        /* NCUA: a { color: inherit } → gray-700 */
+  --ifm-link-hover-color: #171818;
+  --ifm-link-text-decoration: none;
   --ifm-code-font-size: 95%;
-  --ifm-navbar-height: 56px;
-  --ifm-navbar-shadow: none;
+  --ifm-footer-background-color: var(--gray-50);
+  --ifm-footer-color: var(--gray-400);
   --docusaurus-highlighted-code-line-bg: rgba(0, 0, 0, 0.1);
 }
 
-[data-theme='dark'] {
-  --ifm-color-primary: #e0e0e0;
-  --ifm-color-primary-dark: #c9c9c9;
-  --ifm-color-primary-darker: #bfbfbf;
-  --ifm-color-primary-darkest: #9e9e9e;
-  --ifm-color-primary-light: #f0f0f0;
-  --ifm-color-primary-lighter: #f5f5f5;
-  --ifm-color-primary-lightest: #fff;
-  --ifm-background-color: #191919;
-  --ifm-navbar-background-color: #191919;
-  --docusaurus-highlighted-code-line-bg: rgba(0, 0, 0, 0.3);
+/* body 텍스트 색상 명시 */
+body {
+  line-height : 1.6;
+  color: var(--gray-700, #171818);
+  font-family: var(--font-families-commerce-sans, CommerceSans, 'Noto Sans KR', sans-serif);
 }
 
-/* Navbar - 미니멀 */
+/* ============================================================
+   Navbar — NCUA dc-navbar 스타일 적용
+   ============================================================ */
 .navbar {
-  border-bottom: 1px solid var(--ifm-color-emphasis-200);
-  box-shadow: none;
+  border-bottom: 1px solid var(--gray-100);
+  box-shadow: var(--shadow-xs);
+  padding: 0 24px;
+  justify-content: flex-start;  /* 전체 navbar 내용 왼쪽 정렬 */
+}
+
+.navbar__inner {
+  width: 100%;
+  max-width: 1200px;
+  margin: 0;                     /* 오른쪽 auto 제거 → 왼쪽 붙임 */
+  justify-content: flex-start;
+  gap: 24px;
+}
+
+/* 브랜드 타이틀 */
+.navbar__brand {
+  font-size: 17px;
+  font-weight: 700;
+  color: var(--gray-700, #171818);
+  margin-right: 0;
+  padding: 0;
 }
 
 .navbar__title {
-  font-size: 0.95rem;
-  font-weight: 500;
-  letter-spacing: -0.02em;
+  font-size: 17px;
+  font-weight: 700;
+  color: var(--gray-700, #171818);
+  letter-spacing: normal;
 }
 
-/* 사이드바 Notion 스타일 */
+/* 네비 링크 */
+.navbar__link {
+  font-size: 14px;
+  font-weight: 500;
+  color: var(--gray-600, #2f2f30);
+  border-radius: 6px;
+  padding: 8px 12px;
+}
+
+.navbar__link:hover {
+  background: var(--gray-50, #f6f7f9);
+  color: var(--gray-700, #171818);
+}
+
+.navbar__link--active {
+  color: var(--gray-700, #171818);
+  background: transparent;
+}
+
+/* 드롭다운 */
+.dropdown__menu {
+  border: 1px solid var(--gray-100, #eaecf0);
+  border-radius: 8px;
+  box-shadow: var(--shadow-md);
+  padding: 6px;
+  min-width: 160px;
+}
+
+.dropdown__link {
+  font-size: 13px;
+  font-weight: 500;
+  color: var(--gray-600, #2f2f30);
+  border-radius: 6px;
+  padding: 8px 12px;
+}
+
+.dropdown__link:hover {
+  background: var(--gray-50, #f6f7f9);
+  color: var(--gray-700, #171818);
+}
+
+.dropdown__link--active {
+  color: var(--gray-700, #171818);
+  font-weight: 700;
+}
+
+/* ============================================================
+   Body / Layout
+   ============================================================ */
+html {
+  background: var(--gray-50);
+}
+
+/* ============================================================
+   Sidebar — NCUA 톤에 맞게 경량화
+   ============================================================ */
+.menu {
+  background: var(--base-white);
+  border-right: 1px solid var(--gray-100);
+  font-size: 13px;
+}
+
 .menu__link {
-  font-size: 0.875rem;
-  border-radius: 4px;
-  padding: 6px 12px;
+  font-size: 13px;
   font-weight: 400;
+  border-radius: 6px;
+  padding: 6px 12px;
+  color: var(--gray-600);
 }
 
 .menu__link:hover {
-  background: var(--ifm-color-emphasis-100);
+  background: var(--gray-50);
+  color: var(--gray-700);
 }
 
 .menu__link--active {
-  font-weight: 500;
-  background: var(--ifm-color-emphasis-100);
+  font-weight: 600;
+  color: var(--gray-700);
+  background: var(--gray-100);
 }
 
 .menu__list-item-collapsible .menu__link {
-  font-weight: 500;
-  font-size: 0.8rem;
+  font-size: 12px;
+  font-weight: 600;
+  color: var(--gray-500);
   text-transform: uppercase;
-  letter-spacing: 0.03em;
-  color: var(--ifm-color-emphasis-600);
+  letter-spacing: 0.04em;
 }
 
-/* 문서 페이지 */
+/* ============================================================
+   Doc / Markdown 본문
+   ============================================================ */
 .markdown h1 {
-  font-size: 2rem;
+  font-size: 1.75rem;
   font-weight: 700;
   letter-spacing: -0.03em;
+  color: var(--gray-700);
   margin-bottom: 1.5rem;
 }
 
 .markdown h2 {
-  font-size: 1.4rem;
-  font-weight: 600;
+  font-size: 1.25rem;
+  font-weight: 700;
   letter-spacing: -0.02em;
+  color: var(--gray-700);
   margin-top: 2.5rem;
   padding-bottom: 0.4rem;
-  border-bottom: 1px solid var(--ifm-color-emphasis-200);
+  border-bottom: 1px solid var(--gray-100);
 }
 
 .markdown h3 {
-  font-size: 1.15rem;
+  font-size: 1.05rem;
   font-weight: 600;
+  color: var(--gray-700);
 }
 
-/* 테이블 Notion 스타일 */
 .markdown table {
   border-collapse: collapse;
   width: 100%;
-  font-size: 0.9rem;
+  font-size: 13px;
 }
 
 .markdown table th {
-  background: var(--ifm-color-emphasis-100);
-  font-weight: 500;
+  background: var(--gray-50);
+  font-weight: 600;
+  color: var(--gray-700);
   text-align: left;
 }
 
 .markdown table td,
 .markdown table th {
-  border: 1px solid var(--ifm-color-emphasis-200);
+  border: 1px solid var(--gray-100);
   padding: 8px 12px;
 }
 
-/* 코드블록 */
 .markdown code {
-  border: 1px solid var(--ifm-color-emphasis-200);
-  background: var(--ifm-color-emphasis-100);
-  border-radius: 3px;
+  border: 1px solid var(--gray-200);
+  background: var(--gray-50);
+  border-radius: 4px;
   padding: 2px 5px;
   font-size: 0.85em;
+  color: var(--gray-700);
 }
 
-/* diff2html 스타일 오버라이드 */
+/* ============================================================
+   Footer — NCUA dc-footer 스타일
+   ============================================================ */
+.footer {
+  background: var(--gray-50);
+  border-top: 1px solid var(--gray-100);
+  padding: 20px 24px;
+}
+
+.footer__copyright {
+  font-size: 12px;
+  color: var(--gray-400);
+}
+
+/* ============================================================
+   Home 페이지 — NCUA dc-home / dc-hero / dc-card-grid
+   ============================================================ */
+.dc-home {
+  max-width: 1200px;
+  width: 100%;
+  margin: 0 auto;
+  padding: 64px 32px 80px;
+  flex: 1;
+}
+
+.dc-hero {
+  margin-bottom: 40px;
+}
+
+.dc-home .dc-hero__eyebrow {
+  font-size: 13px;
+  font-weight: 600;
+  color: var(--gray-400, #757678);
+  margin-bottom: 8px;
+}
+
+.dc-home .dc-hero__title {
+  font-size: 32px;
+  font-weight: 700;
+  letter-spacing: -0.03em;
+  line-height: 1.35;
+  color: var(--gray-700, #171818);
+  margin-bottom: 12px;
+}
+
+.dc-home .dc-hero__desc {
+  font-size: 15px;
+  color: var(--gray-500, #464748);  /* home.html 기준 gray-500 */
+  line-height: 1.7;
+  max-width: 540px;
+}
+
+.dc-card-grid {
+  display: grid;
+  grid-template-columns: repeat(2, 1fr);
+  gap: 20px;
+}
+
+.dc-entry-card {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;   /* Docusaurus CSS 간섭 차단 — CTA 왼쪽 정렬 보장 */
+  gap: 12px;
+  padding: 28px;
+  height: 100%;
+  background: var(--base-white, #fff);
+  border: 1px solid var(--gray-100, #eaecf0);
+  border-radius: 12px;
+  box-shadow: var(--shadow-sm);
+  transition: border-color .15s, box-shadow .15s, transform .15s;
+  text-decoration: none;
+  color: inherit;
+}
+
+.dc-entry-card:hover {
+  border-color: var(--gray-200, #d3d4d8);
+  box-shadow: var(--shadow-md);
+  transform: translateY(-2px);
+  color: inherit;
+  text-decoration: none;
+}
+
+.dc-entry-card .dc-entry-card__title {
+  font-size: 20px;
+  font-weight: 700;
+  letter-spacing: -0.02em;
+  color: var(--gray-700, #171818);
+}
+
+/* home.html 기준: margin-top/align-self/text-decoration 만
+   display·height·padding·gap 은 CDN ncua-btn--sm 이 제공해야 하나
+   Docusaurus 번들에 밀려 무효 → 여기서 명시 고정 */
+.dc-entry-card .dc-entry-card__cta {
+  margin-top: auto;
+  align-self: flex-start;
+  text-decoration: none;
+  display: inline-flex;
+  align-items: center;
+  height: var(--button-height-sm, 36px);
+  gap: 8px;
+  border-radius: 6px;
+}
+
+@media (max-width: 720px) {
+  .dc-card-grid { grid-template-columns: 1fr; }
+  .dc-home { padding: 40px 20px 64px; }
+  .dc-hero__title { font-size: 26px; }
+}
+
+/* ============================================================
+   Release Notes Timeline — 월별 아코디언 타임라인
+   ============================================================ */
+
+/* NCUA PageTitle 오버라이드 (커스텀 페이지용) */
+.ncua-page-title {
+  max-width: 1200px;
+  width: 100%;
+  margin: 0 auto;
+  padding: 24px 40px;
+  border-bottom: 1px solid var(--gray-100);
+  background: transparent !important;
+  box-shadow: none !important;
+}
+.ncua-page-title__page-header,
+.ncua-page-title__header,
+.ncua-page-title__container {
+  padding: 0 !important;
+  max-width: none !important;
+  background: transparent !important;
+  box-shadow: none !important;
+}
+
+/* 타임라인 래퍼 */
+.dc-timeline-wrap {
+  max-width: 1200px;
+  width: 100%;
+  margin: 0 auto;
+  padding: 32px 40px 80px;
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+}
+
+/* 월별 그룹 — details 아코디언 */
+details.dc-month-group {
+  background: var(--base-white);
+  border: 1px solid var(--gray-100);
+  border-radius: 12px;
+  box-shadow: var(--shadow-sm);
+  overflow: hidden;
+}
+
+details.dc-month-group > summary {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 10px 24px;
+  min-height: 48px;
+  cursor: pointer;
+  list-style: none;
+  border-bottom: 1px solid transparent;
+  gap: 8px;
+  transition: background .1s;
+}
+
+details.dc-month-group > summary::-webkit-details-marker { display: none; }
+
+details.dc-month-group[open] > summary {
+  border-bottom-color: var(--gray-100);
+}
+
+.dc-month-group__label {
+  font-size: 16px;
+  font-weight: 700;
+  line-height: 1.5;
+  color: var(--gray-700);
+  display: flex;
+  align-items: center;
+  gap: 6px;
+}
+
+.dc-month-group__count {
+  font-size: 13px;
+  font-weight: 500;
+  color: var(--gray-400);
+}
+
+.dc-month-group__caret {
+  width: 24px;
+  height: 24px;
+  color: var(--gray-300);
+  transition: transform .15s;
+  flex-shrink: 0;
+}
+
+details.dc-month-group[open] .dc-month-group__caret {
+  transform: rotate(180deg);
+}
+
+/* 날짜 행 */
+.dc-date-row {
+  display: grid;
+  grid-template-columns: 110px 1fr;
+  gap: 0 24px;
+  padding: 16px 24px;
+  position: relative;
+}
+
+.dc-date-row + .dc-date-row::before {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: 24px;
+  right: 24px;
+  border-top: 1px solid var(--gray-100);
+}
+
+.dc-date-label {
+  font-size: 13px;
+  font-weight: 700;
+  color: var(--gray-500);
+  letter-spacing: .02em;
+  padding-top: 7px;
+  white-space: nowrap;
+}
+
+/* 날짜 카드 */
+.dc-date-card {
+  background: var(--base-white);
+  border: 1px solid var(--gray-100);
+  border-radius: 12px;
+  overflow: hidden;
+}
+
+.dc-date-card__header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 10px 20px;
+  background: var(--gray-50);
+  border-bottom: 1px solid var(--gray-100);
+  gap: 12px;
+}
+
+.dc-date-card__title {
+  font-size: 14px;
+  font-weight: 700;
+  color: var(--gray-700);
+  flex: 1;
+  min-width: 0;
+  line-height: 1.5;
+}
+
+/* 전체 보기 버튼 */
+.dc-btn-all {
+  display: inline-flex;
+  align-items: center;
+  padding: 5px 12px;
+  font-size: 12px;
+  font-weight: 600;
+  color: var(--gray-600);
+  background: var(--base-white);
+  border: 1px solid var(--gray-200);
+  border-radius: 7px;
+  transition: border-color .15s, color .15s;
+  white-space: nowrap;
+  flex-shrink: 0;
+  text-decoration: none;
+}
+
+.dc-btn-all:hover {
+  border-color: var(--gray-300);
+  color: var(--gray-700);
+  text-decoration: none;
+}
+
+/* 카테고리 그룹 */
+.dc-patch-group + .dc-patch-group {
+  border-top: 1px solid var(--gray-100);
+}
+
+.dc-patch-group__label {
+  font-size: 11px;
+  font-weight: 700;
+  color: var(--gray-400);
+  text-transform: uppercase;
+  letter-spacing: .05em;
+  padding: 6px 20px;
+  background: var(--gray-50);
+  border-bottom: 1px solid var(--gray-100);
+}
+
+/* 패치 항목 리스트 */
+.dc-patch-list {
+  list-style: none;
+  display: flex;
+  flex-direction: column;
+  background: var(--base-white);
+}
+
+.dc-patch-item {
+  background: var(--base-white);
+}
+
+.dc-patch-item + .dc-patch-item {
+  border-top: 1px solid var(--gray-100);
+}
+
+.dc-patch-item__row {
+  display: flex;
+  align-items: flex-start;
+  gap: 12px;
+  padding: 11px 20px;
+}
+
+/* 아이콘 기본 — 보안 (Pink) */
+.dc-patch-item__icon {
+  flex-shrink: 0;
+  width: 28px;
+  height: 28px;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  border-radius: 7px;
+  background: var(--pink-100);
+  color: var(--pink-600);
+  margin-top: 1px;
+}
+
+.dc-patch-item__icon svg {
+  width: 14px;
+  height: 14px;
+}
+
+/* 아이콘 변형 — 기능/수정 (Violet) */
+.dc-patch-item--feature .dc-patch-item__icon {
+  background: var(--violet-100);
+  color: var(--violet-600);
+}
+
+.dc-patch-item__name {
+  font-size: 14px;
+  font-weight: 500;
+  color: var(--gray-700);
+  line-height: 1.571;
+  flex: 1;
+  min-width: 0;
+}
+
+@media (max-width: 760px) {
+  .ncua-page-title { padding-left: 20px; padding-right: 20px; }
+  .dc-timeline-wrap { padding-left: 20px; padding-right: 20px; padding-bottom: 48px; }
+  .dc-date-row { grid-template-columns: 1fr; gap: 8px; padding: 16px 20px; }
+  details.dc-month-group > summary { padding: 12px 20px; }
+}
+
+/* ============================================================
+   diff2html 스타일 오버라이드
+   ============================================================ */
 .diff-viewer {
   margin: 1.5rem 0;
   font-size: 11px;
@@ -125,14 +600,14 @@
 }
 
 .diff-viewer .d2h-wrapper {
-  border: 1px solid var(--ifm-color-emphasis-200);
+  border: 1px solid var(--gray-100);
   border-radius: 8px;
   overflow: hidden;
   min-width: 0;
 }
 
 .diff-viewer .d2h-file-header {
-  font-family: 'Noto Sans KR', sans-serif;
+  font-family: CommerceSans, 'Noto Sans KR', sans-serif;
   font-weight: 500;
   font-size: 12px;
   padding: 4px 8px;
@@ -159,8 +634,6 @@
   line-height: 1.35;
 }
 
-/* 각 row 높이 tight하게 + 일반 .markdown table td에 붙는 1px 테두리 제거
-   (다크모드 테두리는 별도 규칙에서 #2a2a2a 로 재정의) */
 .diff-viewer .d2h-diff-table td {
   padding-top: 0;
   padding-bottom: 0;
@@ -202,14 +675,10 @@
   padding: 0 0.5rem;
 }
 
-/* diff 페이지에서는 container max-width 제거하여 전폭 활용 */
 body:has(.diff-viewer) .container {
   max-width: 100% !important;
 }
 
-/* diff 페이지에서는 우측 ToC 컬럼 숨기고 본문이 전폭 차지
-   Docusaurus가 @layer docusaurus.theme-classic 안에서 max-width:75% !important 로
-   잠그고 있어서 같은 레이어로 덮어써야 실제 전폭이 적용됨. */
 @layer docusaurus.theme-classic {
   body:has(.diff-viewer) .row > [class*="col--3"] {
     display: none !important;
@@ -220,8 +689,6 @@ body:has(.diff-viewer) .container {
   }
 }
 
-/* 좌/우 패널 각각 독립 스크롤 — 얇은 스크롤바.
-   .d2h-file-diff(바깥 래퍼)의 overflow 는 제거해서 스크롤바가 이중으로 뜨지 않게. */
 .diff-viewer .d2h-file-diff {
   overflow: visible;
 }
@@ -229,48 +696,21 @@ body:has(.diff-viewer) .container {
 .diff-viewer .d2h-file-side-diff {
   overflow-x: auto;
   overflow-y: hidden;
-  scrollbar-width: thin; /* Firefox */
+  scrollbar-width: thin;
 }
 
-.diff-viewer .d2h-file-side-diff::-webkit-scrollbar {
-  height: 6px;
-  width: 6px;
-}
-
-.diff-viewer .d2h-file-side-diff::-webkit-scrollbar-thumb {
-  background: rgba(0, 0, 0, 0.25);
-  border-radius: 3px;
-}
-
-.diff-viewer .d2h-file-side-diff::-webkit-scrollbar-thumb:hover {
-  background: rgba(0, 0, 0, 0.45);
-}
-
-.diff-viewer .d2h-file-side-diff::-webkit-scrollbar-track {
-  background: transparent;
-}
-
-[data-theme='dark'] .diff-viewer .d2h-file-side-diff::-webkit-scrollbar-thumb {
-  background: rgba(255, 255, 255, 0.2);
-}
-
-[data-theme='dark'] .diff-viewer .d2h-file-side-diff::-webkit-scrollbar-thumb:hover {
-  background: rgba(255, 255, 255, 0.4);
-}
+.diff-viewer .d2h-file-side-diff::-webkit-scrollbar { height: 6px; width: 6px; }
+.diff-viewer .d2h-file-side-diff::-webkit-scrollbar-thumb { background: rgba(0,0,0,.25); border-radius: 3px; }
+.diff-viewer .d2h-file-side-diff::-webkit-scrollbar-thumb:hover { background: rgba(0,0,0,.45); }
+.diff-viewer .d2h-file-side-diff::-webkit-scrollbar-track { background: transparent; }
 
 .diff-viewer .d2h-diff-table {
   display: block;
-  /* 짧은 줄은 100% 차지, 긴 줄은 내용 너비까지 확장되어
-     .d2h-file-side-diff 의 가로 스크롤이 자연스럽게 동작 */
   min-width: 100%;
   width: max-content;
-  /* 테이블 자체에는 스크롤바가 뜨지 않도록 — 가로 스크롤은 상위 패널이 담당 */
   overflow: visible;
 }
 
-/* diff2html 기본 display:block 에서는 tr/td가 내용 너비만 차지해서
-   빈 placeholder 행이 패널을 못 채움 → tbody/tr을 block+flex 로 펼쳐
-   각 셀이 패널 전폭을 차지하게 함 */
 .diff-viewer .d2h-diff-tbody {
   display: block;
   min-width: 100%;
@@ -280,19 +720,17 @@ body:has(.diff-viewer) .container {
 .diff-viewer .d2h-diff-table tr {
   display: flex;
   align-items: stretch;
-  min-width: 100%; /* 짧은 줄도 패널 전폭 차지 */
-  width: max-content; /* 긴 줄이면 컨텐츠 너비로 넓어짐 */
+  min-width: 100%;
+  width: max-content;
 }
 
 .diff-viewer .d2h-diff-table td.d2h-code-side-linenumber {
   flex: 0 0 30px;
   box-sizing: border-box;
-  position: static; /* diff2html 기본값은 absolute — flex 레이아웃 참여시키려면 static */
+  position: static;
 }
 
 .diff-viewer .d2h-diff-table td:not(.d2h-code-side-linenumber) {
-  /* 내용이 길면 컨텐츠 너비로 넓어져서 .d2h-file-side-diff 의 가로 스크롤 발동,
-     내용이 짧으면 grow로 남은 공간 채움 */
   flex: 1 0 auto;
   box-sizing: border-box;
   min-width: 0;
@@ -300,126 +738,4 @@ body:has(.diff-viewer) .container {
 
 .diff-viewer .d2h-code-side-line {
   width: 100%;
-}
-
-/* 다크모드 diff — 흰 줄 방지를 위해 모든 요소 배경/테두리 통일 */
-[data-theme='dark'] .diff-viewer .d2h-wrapper {
-  border-color: #404040;
-}
-
-[data-theme='dark'] .diff-viewer .d2h-file-header {
-  background: #2d2d2d;
-  border-bottom-color: #404040;
-}
-
-[data-theme='dark'] .diff-viewer .d2h-diff-table {
-  background: #1e1e1e;
-  border-collapse: collapse;
-}
-
-[data-theme='dark'] .diff-viewer .d2h-diff-table td {
-  background: #1e1e1e;
-  border-color: #2a2a2a;
-  color: #d4d4d4;
-}
-
-[data-theme='dark'] .diff-viewer .d2h-code-side-linenumber {
-  background: #252525;
-  color: #666;
-  border-color: #2a2a2a;
-}
-
-[data-theme='dark'] .diff-viewer .d2h-code-line-ctn {
-  background: #1e1e1e;
-  color: #d4d4d4;
-}
-
-[data-theme='dark'] .diff-viewer .d2h-code-side-line {
-  background: #1e1e1e;
-}
-
-[data-theme='dark'] .diff-viewer .d2h-emptyplaceholder {
-  background: #252525;
-  border-color: #2a2a2a;
-}
-
-[data-theme='dark'] .diff-viewer .d2h-info {
-  background: #252525;
-  color: #888;
-  border-color: #2a2a2a;
-}
-
-[data-theme='dark'] .diff-viewer .d2h-file-side-diff {
-  border-color: #2a2a2a;
-}
-
-/* 삭제 행 — 빨간 배경 (td 룰보다 우선순위 높게) */
-[data-theme='dark'] .diff-viewer .d2h-diff-table td.d2h-del {
-  background-color: #5c2225;
-}
-
-[data-theme='dark'] .diff-viewer .d2h-diff-table td.d2h-del .d2h-code-line-ctn {
-  background-color: #5c2225;
-  color: #eeb4b4;
-}
-
-[data-theme='dark'] .diff-viewer .d2h-diff-table td.d2h-del.d2h-code-side-linenumber {
-  background-color: #6b2a2a;
-  color: #cc9999;
-  border-color: #2a2a2a;
-}
-
-/* 삭제 인라인(단어 단위) 강조 */
-[data-theme='dark'] .diff-viewer .d2h-diff-table td.d2h-del .d2h-code-line-ctn del,
-[data-theme='dark'] .diff-viewer .d2h-diff-table td.d2h-del .d2h-code-line-ctn .d2h-change {
-  background-color: #a03535;
-  color: #ffc8c8;
-  text-decoration: none;
-}
-
-/* 추가 행 — 초록 배경 */
-[data-theme='dark'] .diff-viewer .d2h-diff-table td.d2h-ins {
-  background-color: #1d4a2a;
-}
-
-[data-theme='dark'] .diff-viewer .d2h-diff-table td.d2h-ins .d2h-code-line-ctn {
-  background-color: #1d4a2a;
-  color: #b4eeb4;
-}
-
-[data-theme='dark'] .diff-viewer .d2h-diff-table td.d2h-ins.d2h-code-side-linenumber {
-  background-color: #256b30;
-  color: #99cc99;
-  border-color: #2a2a2a;
-}
-
-/* 추가 인라인(단어 단위) 강조 */
-[data-theme='dark'] .diff-viewer .d2h-diff-table td.d2h-ins .d2h-code-line-ctn ins,
-[data-theme='dark'] .diff-viewer .d2h-diff-table td.d2h-ins .d2h-code-line-ctn .d2h-change {
-  background-color: #3a8a3a;
-  color: #c8ffc8;
-  text-decoration: none;
-}
-
-[data-theme='dark'] .diff-viewer .d2h-file-list-wrapper {
-  background: #1e1e1e;
-  border-color: #404040;
-}
-
-/* diff2html 내부 기본 border 제거 */
-[data-theme='dark'] .diff-viewer .d2h-diff-tbody > tr > td {
-  border-left-color: #2a2a2a;
-  border-right-color: #2a2a2a;
-}
-
-/* Footer 미니멀 */
-.footer {
-  background: transparent;
-  border-top: 1px solid var(--ifm-color-emphasis-200);
-  padding: 1.5rem 0;
-}
-
-.footer__copyright {
-  font-size: 0.8rem;
-  color: var(--ifm-color-emphasis-500);
 }
