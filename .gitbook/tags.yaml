@@ -1,12 +1,16 @@
 - tag: add
   label: 기능추가
+  icon: message-plus
   color: pink
 - tag: fix
   label: 버그수정
+  icon: wrench
   color: violet
 - tag: remove
   label: 제거
+  icon: dash
   color: orange
 - tag: change
-  label: 기능변경경
+  label: 기능변경
+  icon: arrows-rotate-reverse
   color: blue
