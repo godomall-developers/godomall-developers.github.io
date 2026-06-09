@@ -1,7 +1,7 @@
 # GODO 25
 
 {% updates format="full" %}
-{% update date="2026-06-01" tags="기능 추가,.,add" %}
+{% update date="2026-06-01" tags="기능 추가,fix" %}
 ## 기능 추가
 
 * 이미지 URL SSRF 관련 조치
