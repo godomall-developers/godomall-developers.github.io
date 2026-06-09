@@ -9,7 +9,7 @@
 * Reflected XSS 관련 조치
 {% endupdate %}
 
-{% update date="2026-05-27" tags="기능 추가" %}
+{% update date="2026-05-27" tags="기능 추가,." %}
 ## 기능 추가
 
 * 장바구니 웹훅 추가
