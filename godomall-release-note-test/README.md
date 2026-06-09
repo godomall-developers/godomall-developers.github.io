@@ -1,52 +1,50 @@
----
-description: 트트
----
+# 릴리즈노트
 
-# 고도몰 릴리즈노트
+## 고도몰 릴리즈노트
 
-### 기능 추가
-- HIGH-09 이미지 URL SSRF - MyappApi.php
-- SQL Injection — moveBdId (게시판)
-- SQL Injection — LIKE/BETWEEN/IN 직접 연결 (ArticleListAdmin, MemoAdmin)
-- SQL Injection — UPDATE/DELETE 직접 연결  GoodsAdmin.php
-- Reflected XSS — bdId 파라미터 JS 탈출 (ArticleViewController)
-- SQL Injection — 동적 테이블명 삽입 (BoardReport.php)
-- SQL Injection — replyStatus (게시판)
-- SQL Injection — getCount 미이스케이프 (ExternalOrder.php)
+#### 기능 추가
 
+* HIGH-09 이미지 URL SSRF - MyappApi.php
+* SQL Injection — moveBdId (게시판)
+* SQL Injection — LIKE/BETWEEN/IN 직접 연결 (ArticleListAdmin, MemoAdmin)
+* SQL Injection — UPDATE/DELETE 직접 연결 GoodsAdmin.php
+* Reflected XSS — bdId 파라미터 JS 탈출 (ArticleViewController)
+* SQL Injection — 동적 테이블명 삽입 (BoardReport.php)
+* SQL Injection — replyStatus (게시판)
+* SQL Injection — getCount 미이스케이프 (ExternalOrder.php)
 
-# 소스 변경 비교 (godo25)
+## 소스 변경 비교 (godo25)
 
-- 변경 파일 수: 18개
+* 변경 파일 수: 18개
 
-## 변경 파일 목록
+### 변경 파일 목록
 
-| 상태 | 파일 경로 |
-|------|----------|
-| M | `Admin/marketing/naver_config.php` |
-| M | `Admin/share/layer_naver_stats.php` |
-| M | `Component/Board/ArticleListAdmin.php` |
-| M | `Component/Board/Board.php` |
-| M | `Component/Board/BoardReport.php` |
-| M | `Component/Goods/GoodsAdmin.php` |
-| M | `Component/Marketing/DBUrl.php` |
-| M | `Component/Marketing/DefineMarketing.php` |
-| M | `Component/Memo/MemoAdmin.php` |
-| M | `Component/Order/ExternalOrder.php` |
-| M | `Component/Worker/AbstractDbUrl.php` |
-| M | `Component/Worker/DbUrl.php` |
-| M | `Component/Worker/NaverBookDbUrl.php` |
-| M | `Component/Worker/NaverDbUrl.php` |
-| M | `Component/Worker/NaverDbUrl3.php` |
-| M | `Controller/Admin/Board/ArticleViewController.php` |
-| M | `Controller/Admin/Marketing/NaverConfigController.php` |
-| M | `Controller/Admin/Share/LayerNaverStatsController.php` |
+| 상태 | 파일 경로                                                  |
+| -- | ------------------------------------------------------ |
+| M  | `Admin/marketing/naver_config.php`                     |
+| M  | `Admin/share/layer_naver_stats.php`                    |
+| M  | `Component/Board/ArticleListAdmin.php`                 |
+| M  | `Component/Board/Board.php`                            |
+| M  | `Component/Board/BoardReport.php`                      |
+| M  | `Component/Goods/GoodsAdmin.php`                       |
+| M  | `Component/Marketing/DBUrl.php`                        |
+| M  | `Component/Marketing/DefineMarketing.php`              |
+| M  | `Component/Memo/MemoAdmin.php`                         |
+| M  | `Component/Order/ExternalOrder.php`                    |
+| M  | `Component/Worker/AbstractDbUrl.php`                   |
+| M  | `Component/Worker/DbUrl.php`                           |
+| M  | `Component/Worker/NaverBookDbUrl.php`                  |
+| M  | `Component/Worker/NaverDbUrl.php`                      |
+| M  | `Component/Worker/NaverDbUrl3.php`                     |
+| M  | `Controller/Admin/Board/ArticleViewController.php`     |
+| M  | `Controller/Admin/Marketing/NaverConfigController.php` |
+| M  | `Controller/Admin/Share/LayerNaverStatsController.php` |
 
----
+***
 
-## 상세 Diff
+### 상세 Diff
 
-### Admin/marketing/naver_config.php
+#### Admin/marketing/naver\_config.php
 
 ```diff
 --- a/Admin/marketing/naver_config.php
@@ -131,7 +129,7 @@ description: 트트
          </tr>
 ```
 
-### Admin/share/layer_naver_stats.php
+#### Admin/share/layer\_naver\_stats.php
 
 ```diff
 --- a/Admin/share/layer_naver_stats.php
@@ -151,7 +149,7 @@ description: 트트
  </div>
 ```
 
-### Component/Board/ArticleListAdmin.php
+#### Component/Board/ArticleListAdmin.php
 
 ```diff
 --- a/Component/Board/ArticleListAdmin.php
@@ -225,7 +223,7 @@ description: 트트
          }
 ```
 
-### Component/Board/Board.php
+#### Component/Board/Board.php
 
 ```diff
 --- a/Component/Board/Board.php
@@ -274,7 +272,7 @@ description: 트트
                          $fields[] = $val['val'];
 ```
 
-### Component/Board/BoardReport.php
+#### Component/Board/BoardReport.php
 
 ```diff
 --- a/Component/Board/BoardReport.php
@@ -301,7 +299,7 @@ description: 트트
                  $result['listType'] = 'board';
 ```
 
-### Component/Goods/GoodsAdmin.php
+#### Component/Goods/GoodsAdmin.php
 
 ```diff
 --- a/Component/Goods/GoodsAdmin.php
@@ -454,7 +452,7 @@ description: 트트
      }
 ```
 
-### Component/Marketing/DBUrl.php
+#### Component/Marketing/DBUrl.php
 
 ```diff
 --- a/Component/Marketing/DBUrl.php
@@ -477,7 +475,7 @@ description: 트트
  
 ```
 
-### Component/Marketing/DefineMarketing.php
+#### Component/Marketing/DefineMarketing.php
 
 ```diff
 --- a/Component/Marketing/DefineMarketing.php
@@ -525,7 +523,7 @@ description: 트트
      }
 ```
 
-### Component/Memo/MemoAdmin.php
+#### Component/Memo/MemoAdmin.php
 
 ```diff
 --- a/Component/Memo/MemoAdmin.php
@@ -606,7 +604,7 @@ description: 트트
          return $getData['list'];
 ```
 
-### Component/Order/ExternalOrder.php
+#### Component/Order/ExternalOrder.php
 
 ```diff
 --- a/Component/Order/ExternalOrder.php
@@ -631,7 +629,7 @@ description: 트트
                  }
 ```
 
-### Component/Worker/AbstractDbUrl.php
+#### Component/Worker/AbstractDbUrl.php
 
 ```diff
 --- a/Component/Worker/AbstractDbUrl.php
@@ -651,7 +649,7 @@ description: 트트
          return $naverMaxCount;
 ```
 
-### Component/Worker/DbUrl.php
+#### Component/Worker/DbUrl.php
 
 ```diff
 --- a/Component/Worker/DbUrl.php
@@ -685,7 +683,7 @@ description: 트트
  
 ```
 
-### Component/Worker/NaverBookDbUrl.php
+#### Component/Worker/NaverBookDbUrl.php
 
 ```diff
 --- a/Component/Worker/NaverBookDbUrl.php
@@ -702,7 +700,7 @@ description: 트트
          $db->strJoin = 'INNER JOIN es_goodsImage gi on gi.goodsNo = g.goodsNo AND  gi.imageKind IN ("magnify", "detail") AND gi.imageNo < 10' .$addJoin;
 ```
 
-### Component/Worker/NaverDbUrl.php
+#### Component/Worker/NaverDbUrl.php
 
 ```diff
 --- a/Component/Worker/NaverDbUrl.php
@@ -781,7 +779,7 @@ description: 트트
       *
 ```
 
-### Component/Worker/NaverDbUrl3.php
+#### Component/Worker/NaverDbUrl3.php
 
 ```diff
 --- a/Component/Worker/NaverDbUrl3.php
@@ -798,7 +796,7 @@ description: 트트
          $db->strJoin = 'INNER JOIN es_goodsImage gi on gi.goodsNo = g.goodsNo AND  gi.imageKind IN ("magnify", "detail") AND gi.imageNo < 10' .$addJoin;
 ```
 
-### Controller/Admin/Board/ArticleViewController.php
+#### Controller/Admin/Board/ArticleViewController.php
 
 ```diff
 --- a/Controller/Admin/Board/ArticleViewController.php
@@ -814,7 +812,7 @@ description: 트트
                  return true;
 ```
 
-### Controller/Admin/Marketing/NaverConfigController.php
+#### Controller/Admin/Marketing/NaverConfigController.php
 
 ```diff
 --- a/Controller/Admin/Marketing/NaverConfigController.php
@@ -829,7 +827,7 @@ description: 트트
  		$this->setData('useFlPlusReview',$plusReviewConfig->getConfig('useFl'));
 ```
 
-### Controller/Admin/Share/LayerNaverStatsController.php
+#### Controller/Admin/Share/LayerNaverStatsController.php
 
 ```diff
 --- a/Controller/Admin/Share/LayerNaverStatsController.php
