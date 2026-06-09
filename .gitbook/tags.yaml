@@ -1,3 +1,11 @@
 - tag: '2026-06-09'
   label: '2026-06-09'
   color: red
+- tag: .
+  label: 기능 추가
+  icon: dog
+  color: pink
+- tag: '.1'
+  label: 버그 수정
+  icon: xmark-to-slot
+  color: cyan
