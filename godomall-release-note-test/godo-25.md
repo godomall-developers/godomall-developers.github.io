@@ -1,7 +1,7 @@
 # GODO 25
 
 {% updates format="full" %}
-{% update date="2026-06-01" tags="기능 추가,." %}
+{% update date="2026-06-01" tags="기능 추가,.,add" %}
 ## 기능 추가
 
 * 이미지 URL SSRF 관련 조치
@@ -9,7 +9,7 @@
 * Reflected XSS 관련 조치
 {% endupdate %}
 
-{% update date="2026-05-27" tags="기능 추가,." %}
+{% update date="2026-05-27" tags="기능 추가,add" %}
 ## 기능 추가
 
 * 장바구니 웹훅 추가
@@ -20,7 +20,7 @@
 * SQL Injection - BuyerInform.php
 {% endupdate %}
 
-{% update date="2026-05-27" tags="버그 수정" %}
+{% update date="2026-05-27" tags="버그 수정,fix" %}
 ## 버그 수정
 
 * 기업회원 가입시, 휴대폰 본인인증 후 회원가입 되지 않는 문제 수정

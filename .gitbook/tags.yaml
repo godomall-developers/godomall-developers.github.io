@@ -1,14 +1,9 @@
-- tag: .
-  label: 기능 추가
-  icon: dog
-  color: pink
-- tag: '.1'
-  label: 버그 수정
-  icon: xmark-to-slot
-  color: cyan
-- tag: '.2'
-  label: 기능 변경
-  color: violet
 - tag: '.3'
   label: 제거
   color: orange
+- tag: add
+  label: 기능추가
+  color: pink
+- tag: fix
+  label: 버그수정정
+  color: violet
