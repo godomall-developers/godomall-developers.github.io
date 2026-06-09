@@ -40,7 +40,7 @@
 * obsConvertFl 처리 로직 단순화 및 중복 'n' 마킹 제거
 {% endupdate %}
 
-{% update date="2026-05-27" tags="기능 변경" %}
+{% update date="2026-05-27" tags="기능 변경,add" %}
 ## 기능 변경
 
 * GodomallSDK 상품상세 조회 내 카테고리 응답
