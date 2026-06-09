@@ -1,9 +1,12 @@
-- tag: '.3'
-  label: 제거
-  color: orange
 - tag: add
   label: 기능추가
   color: pink
 - tag: fix
-  label: 버그수정정
+  label: 버그수정
   color: violet
+- tag: remove
+  label: 제거
+  color: orange
+- tag: change
+  label: 기능변경경
+  color: blue
