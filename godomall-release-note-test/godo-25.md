@@ -1,6 +1,6 @@
 # GODO 25
 
-## 2026년 6월
+## 2026년 6월 9일
 
 {% updates format="full" %}
 {% update date="2026-06-09" tags="." %}
