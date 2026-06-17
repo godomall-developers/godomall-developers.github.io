@@ -210,6 +210,9 @@ const config = {
         theme: {
           customCss: './src/css/custom.css',
         },
+        gtag: {
+          trackingID: 'G-MZEY2NEPRQ',
+        },
       }),
     ],
   ],
@@ -251,9 +254,6 @@ const config = {
       prism: {
         theme: prismThemes.github,
         darkTheme: prismThemes.dracula,
-      },
-      gtag: {
-        trackingID: 'G-MZEY2NEPRQ',
       },
     }),
 };
