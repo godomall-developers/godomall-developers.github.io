@@ -198,10 +198,6 @@ const config = {
   plugins: [
     releaseNotesDataPlugin,
     sourceDiffDataPlugin,
-    [
-      '@docusaurus/plugin-google-tag-manager',
-      { containerId: 'GTM-MCTQ3FS8' },
-    ],
   ],
 
   presets: [
@@ -255,6 +251,9 @@ const config = {
       prism: {
         theme: prismThemes.github,
         darkTheme: prismThemes.dracula,
+      },
+      gtag: {
+        trackingID: 'G-MZEY2NEPRQ',
       },
     }),
 };
