@@ -198,6 +198,10 @@ const config = {
   plugins: [
     releaseNotesDataPlugin,
     sourceDiffDataPlugin,
+    [
+      '@docusaurus/plugin-google-tag-manager',
+      { containerId: 'GTM-MCTQ3FS8' },
+    ],
   ],
 
   presets: [
