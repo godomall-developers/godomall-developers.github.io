@@ -162,7 +162,7 @@ const reverseChronologicalSidebar = async ({defaultSidebarItemsGenerator, ...arg
 const config = {
   title: '고도몰 개발자 센터',
   tagline: 'Godomall Developer Center',
-  favicon: 'img/favicon.ico',
+  favicon: 'img/godomall_favicon.png',
 
   future: {
     v4: true,
