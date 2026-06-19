@@ -17,14 +17,6 @@ const sections = [
     title: '릴리즈노트 (GODO 26)',
     link: '/release-notes-godo26',
   },
-  {
-    title: '소스 diff (GODO 25)',
-    link: '/source-diff-godo25',
-  },
-  {
-    title: '소스 diff (GODO 26)',
-    link: '/source-diff-godo26',
-  },
 ];
 
 function Card({ title, link }) {

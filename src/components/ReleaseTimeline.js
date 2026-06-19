@@ -15,6 +15,12 @@ const GearIcon = () => (
   </svg>
 );
 
+const ExtLinkIcon = () => (
+  <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" aria-hidden="true">
+    <path d="M10 6H6a2 2 0 0 0-2 2v10a2 2 0 0 0 2 2h10a2 2 0 0 0 2-2v-4M14 4h6m0 0v6m0-6L10 14"/>
+  </svg>
+);
+
 const CaretDownIcon = () => (
   <svg className="dc-month-group__caret" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" aria-hidden="true">
     <path d="m6 9 6 6 6-6"/>
@@ -37,16 +43,30 @@ function isSecurityItem(name) {
 
 // ─── Sub-components ───────────────────────────────────────────────────────────
 
-function PatchItem({ name }) {
+function PatchItem({ name, descs, diffPath }) {
   const secure = isSecurityItem(name);
+  const inner = (
+    <>
+      <span className="dc-patch-item__icon">
+        {secure ? <ShieldIcon /> : <GearIcon />}
+      </span>
+      <span className="dc-patch-item__body">
+        <span className="dc-patch-item__name">{name}</span>
+        {descs && descs.map((desc, i) => (
+          <span key={i} className="dc-patch-item__desc">{desc}</span>
+        ))}
+      </span>
+      {diffPath && (
+        <span className="dc-patch-item__ext"><ExtLinkIcon /></span>
+      )}
+    </>
+  );
   return (
     <li className={`dc-patch-item${secure ? '' : ' dc-patch-item--feature'}`}>
-      <div className="dc-patch-item__row">
-        <span className="dc-patch-item__icon">
-          {secure ? <ShieldIcon /> : <GearIcon />}
-        </span>
-        <span className="dc-patch-item__name">{name}</span>
-      </div>
+      {diffPath
+        ? <Link className="dc-patch-item__link" to={diffPath}>{inner}</Link>
+        : <div className="dc-patch-item__row">{inner}</div>
+      }
     </li>
   );
 }
@@ -72,7 +92,7 @@ function DateCard({ date, diffPath, groups }) {
             )}
             <ul className="dc-patch-list">
               {group.items.map((item) => (
-                <PatchItem key={item} name={item} />
+                <PatchItem key={item.name} name={item.name} descs={item.descs} diffPath={item.diffPath} />
               ))}
             </ul>
           </div>

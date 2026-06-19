@@ -574,13 +574,62 @@ details.dc-month-group[open] .dc-month-group__caret {
   color: var(--violet-600);
 }
 
+/* 항목 본문 래퍼 — 설명이 있을 때 column 방향으로 쌓임 */
+.dc-patch-item__body {
+  flex: 1;
+  min-width: 0;
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+}
+
 .dc-patch-item__name {
   font-size: 14px;
   font-weight: 500;
   color: var(--gray-700);
   line-height: 1.571;
-  flex: 1;
-  min-width: 0;
+}
+
+/* 항목 행 — diff 링크 있을 때 전체 행이 클릭 가능 */
+.dc-patch-item__link {
+  display: flex;
+  align-items: flex-start;
+  gap: 12px;
+  padding: 11px 20px;
+  color: inherit;
+  text-decoration: none;
+}
+
+.dc-patch-item__link:hover {
+  background: var(--gray-50);
+  color: inherit;
+  text-decoration: none;
+}
+
+/* 외부 링크 아이콘 */
+.dc-patch-item__ext {
+  flex-shrink: 0;
+  display: inline-flex;
+  align-items: center;
+  color: var(--gray-400);
+  margin-top: 2px;
+}
+
+.dc-patch-item__ext svg {
+  width: 16px;
+  height: 16px;
+}
+
+/* 항목 설명 — 앞에 ㆍ 블릿 */
+.dc-patch-item__desc {
+  font-size: 13px;
+  font-weight: 400;
+  color: var(--gray-400);
+  line-height: 1.6;
+}
+
+.dc-patch-item__desc::before {
+  content: 'ㆍ ';
 }
 
 @media (max-width: 760px) {
