@@ -241,6 +241,11 @@ html {
   background: var(--gray-50);
   border-top: 1px solid var(--gray-100);
   padding: 20px 24px;
+  text-align: center;
+}
+
+.footer .container {
+  margin: 0 auto;
 }
 
 .footer__copyright {
