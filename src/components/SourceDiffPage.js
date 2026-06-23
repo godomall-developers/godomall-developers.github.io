@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { useState } from 'react';
 import Layout from '@theme/Layout';
 import Link from '@docusaurus/Link';
 
@@ -203,6 +203,8 @@ function DiffLegend() {
 // files: Array<{ path, status, anchorId }>
 
 function FileListSidebar({ totalCount, files }) {
+  const [collapsed, setCollapsed] = useState(false);
+
   const groups = {};
   files.forEach(f => {
     const parts = f.path.split('/');
@@ -210,37 +212,58 @@ function FileListSidebar({ totalCount, files }) {
     if (!groups[group]) groups[group] = [];
     groups[group].push(f);
   });
+
   return (
-    <section className="block block--source-list" aria-labelledby="srcListTitle">
+    <section
+      className={`block block--source-list${collapsed ? ' block--source-list--collapsed' : ''}`}
+      aria-labelledby="srcListTitle"
+    >
       <div className="block__header">
-        <span className="block__title" id="srcListTitle">변경 파일 목록</span>
-        <span className="block__summary">총 <b>{totalCount}</b>개</span>
+        {!collapsed && <span className="block__title" id="srcListTitle">변경 파일 목록</span>}
+        <div className="src-list-header-right">
+          {!collapsed && <span className="block__summary">총 <b>{totalCount}</b>개</span>}
+          <button
+            className="src-list-toggle"
+            onClick={() => setCollapsed(c => !c)}
+            title={collapsed ? '파일 목록 펼치기' : '파일 목록 접기'}
+          >
+            <svg
+              className={`src-list-toggle__icon${collapsed ? ' src-list-toggle__icon--open' : ''}`}
+              xmlns="http://www.w3.org/2000/svg" width="16" height="16"
+              fill="none" viewBox="0 0 24 24"
+            >
+              <path stroke="currentColor" strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="m15 18-6-6 6-6"/>
+            </svg>
+          </button>
+        </div>
       </div>
-      <div className="block__body">
-        {Object.entries(groups).map(([group, groupFiles]) => (
-          <div key={group}>
-            <div className="src-group">
-              {group}{' '}
-              <span style={{ fontWeight: 400, fontSize: 11, color: 'var(--gray-400)' }}>
-                ({groupFiles.length})
-              </span>
+      {!collapsed && (
+        <div className="block__body">
+          {Object.entries(groups).map(([group, groupFiles]) => (
+            <div key={group}>
+              <div className="src-group">
+                {group}{' '}
+                <span style={{ fontWeight: 400, fontSize: 11, color: 'var(--gray-400)' }}>
+                  ({groupFiles.length})
+                </span>
+              </div>
+              {groupFiles.map(f => {
+                const parts = f.path.split('/');
+                const name  = parts[parts.length - 1];
+                const dir   = parts.slice(1, -1).join('/') + (parts.length > 2 ? '/' : '');
+                return (
+                  <a key={f.anchorId} className="src-item" href={`#${f.anchorId}`}>
+                    <span className="src-item__body">
+                      <span className="src-item__name">{name}</span>
+                      {dir && <span className="src-item__path">{dir}</span>}
+                    </span>
+                  </a>
+                );
+              })}
             </div>
-            {groupFiles.map(f => {
-              const parts = f.path.split('/');
-              const name  = parts[parts.length - 1];
-              const dir   = parts.slice(1, -1).join('/') + (parts.length > 2 ? '/' : '');
-              return (
-                <a key={f.anchorId} className="src-item" href={`#${f.anchorId}`}>
-                  <span className="src-item__body">
-                    <span className="src-item__name">{name}</span>
-                    {dir && <span className="src-item__path">{dir}</span>}
-                  </span>
-                </a>
-              );
-            })}
-          </div>
-        ))}
-      </div>
+          ))}
+        </div>
+      )}
     </section>
   );
 }
@@ -289,6 +312,7 @@ function CombinedDiffPage({ pageData }) {
   const versionLabel = version === 'godo25' ? 'GODO 25' : 'GODO 26';
 
   const totalCount = items.reduce((sum, item) => sum + (item.fileCount || 0), 0);
+  const [collapsed, setCollapsed] = useState(false);
 
   return (
     <Layout title={`${date} 소스 변경 전체 보기 | ${versionLabel}`}>
@@ -297,31 +321,51 @@ function CombinedDiffPage({ pageData }) {
         <div className="dc-split">
 
           {/* Left — item name 기준 그룹 */}
-          <section className="block block--source-list" aria-labelledby="srcListTitle">
+          <section
+            className={`block block--source-list${collapsed ? ' block--source-list--collapsed' : ''}`}
+            aria-labelledby="srcListTitle"
+          >
             <div className="block__header">
-              <span className="block__title" id="srcListTitle">변경 파일 목록</span>
-              <span className="block__summary">총 <b>{totalCount}</b>개</span>
+              {!collapsed && <span className="block__title" id="srcListTitle">변경 파일 목록</span>}
+              <div className="src-list-header-right">
+                {!collapsed && <span className="block__summary">총 <b>{totalCount}</b>개</span>}
+                <button
+                  className="src-list-toggle"
+                  onClick={() => setCollapsed(c => !c)}
+                  title={collapsed ? '파일 목록 펼치기' : '파일 목록 접기'}
+                >
+                  <svg
+                    className={`src-list-toggle__icon${collapsed ? ' src-list-toggle__icon--open' : ''}`}
+                    xmlns="http://www.w3.org/2000/svg" width="16" height="16"
+                    fill="none" viewBox="0 0 24 24"
+                  >
+                    <path stroke="currentColor" strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="m15 18-6-6 6-6"/>
+                  </svg>
+                </button>
+              </div>
             </div>
-            <div className="block__body">
-              {items.map((item, gi) => (
-                <div key={gi}>
-                  <div className="src-group">{item.name}</div>
-                  {(item.files || []).map((f, fi) => {
-                    const parts = f.path.split('/');
-                    const name  = parts[parts.length - 1];
-                    const dir   = parts.length > 1 ? parts.slice(0, -1).join('/') + '/' : '';
-                    return (
-                      <a key={fi} className="src-item" href={`#g${gi}-f${fi}`}>
-                        <span className="src-item__body">
-                          <span className="src-item__name">{name}</span>
-                          {dir && <span className="src-item__path">{dir}</span>}
-                        </span>
-                      </a>
-                    );
-                  })}
-                </div>
-              ))}
-            </div>
+            {!collapsed && (
+              <div className="block__body">
+                {items.map((item, gi) => (
+                  <div key={gi}>
+                    <div className="src-group">{item.name}</div>
+                    {(item.files || []).map((f, fi) => {
+                      const parts = f.path.split('/');
+                      const name  = parts[parts.length - 1];
+                      const dir   = parts.length > 1 ? parts.slice(0, -1).join('/') + '/' : '';
+                      return (
+                        <a key={fi} className="src-item" href={`#g${gi}-f${fi}`}>
+                          <span className="src-item__body">
+                            <span className="src-item__name">{name}</span>
+                            {dir && <span className="src-item__path">{dir}</span>}
+                          </span>
+                        </a>
+                      );
+                    })}
+                  </div>
+                ))}
+              </div>
+            )}
           </section>
 
           {/* Right — diff view */}
