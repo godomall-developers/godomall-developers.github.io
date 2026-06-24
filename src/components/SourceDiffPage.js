@@ -148,9 +148,10 @@ const ChevronRight = () => (
 
 // ── Shared page header ────────────────────────────────────────────────────────
 
-function PageHeader({ version, date, subtitle }) {
+function PageHeader({ version, date, subtitle, title }) {
   const versionLabel   = version === 'godo25' ? 'GODO 25' : 'GODO 26';
   const releaseNotesTo = `/release-notes-${version}`;
+  const displayTitle   = title || '소스 변경 전체 보기';
   return (
     <header className="ncua-page-title sdv-page-title">
       <div className="ncua-page-title__page-header">
@@ -165,10 +166,10 @@ function PageHeader({ version, date, subtitle }) {
                 <Link to={releaseNotesTo}>릴리즈노트</Link>
               </span>
               <ChevronRight />
-              <span className="ncua-page-title__breadcrumb-current">소스 변경 전체 보기</span>
+              <span className="ncua-page-title__breadcrumb-current">{displayTitle}</span>
             </nav>
             <div className="ncua-page-title__title-row">
-              <h1 className="ncua-page-title__title">소스 변경 전체 보기</h1>
+              <h1 className="ncua-page-title__title">{displayTitle}</h1>
               <span className="dc-version-pill">
                 <span className="dc-version-pill__dot" />
                 {versionLabel}
@@ -271,15 +272,15 @@ function FileListSidebar({ totalCount, files }) {
 // ── Single diff page ──────────────────────────────────────────────────────────
 
 function SingleDiffPage({ pageData }) {
-  const { date, version, fileCount, files, diffs } = pageData;
+  const { date, version, fileCount, files, diffs, title } = pageData;
   const versionLabel = version === 'godo25' ? 'GODO 25' : 'GODO 26';
 
   const sidebarFiles = files.map((f, i) => ({ ...f, anchorId: `file-${i}` }));
   const totalCount   = fileCount;
 
   return (
-    <Layout title={`${date} 소스 변경 비교 | ${versionLabel}`}>
-      <PageHeader version={version} date={date} subtitle={`${date} · 변경 파일 수: ${totalCount}개`} />
+    <Layout title={`${title || date} 소스 변경 비교 | ${versionLabel}`}>
+      <PageHeader version={version} date={date} subtitle={`변경 파일 수: ${totalCount}개`} title={title} />
       <div className="sdv-page-content">
         <div className="dc-split">
           <FileListSidebar totalCount={totalCount} files={sidebarFiles} />
@@ -316,7 +317,7 @@ function CombinedDiffPage({ pageData }) {
 
   return (
     <Layout title={`${date} 소스 변경 전체 보기 | ${versionLabel}`}>
-      <PageHeader version={version} date={date} subtitle={`${date} · 변경 파일 수: ${totalCount}개`} />
+      <PageHeader version={version} date={date} subtitle={`변경 파일 수: ${totalCount}개`} />
       <div className="sdv-page-content">
         <div className="dc-split">
 

@@ -112,11 +112,22 @@ async function sourceDiffDataPlugin(context) {
 
         for (const dateDir of dateDirs) {
           const datePath = path.join(dir, dateDir);
+          // 릴리즈노트에서 issueId → 제목 맵 미리 구성
+          const rnFile = path.join(context.siteDir, 'docs', `release-notes-${version}`, `${dateDir}.md`);
+          const issueTitleMap = {};
+          if (fs.existsSync(rnFile)) {
+            const groups = parseGroups(fs.readFileSync(rnFile, 'utf-8'));
+            for (const group of groups) {
+              for (const item of group.items) {
+                if (item.issueId) issueTitleMap[item.issueId] = item.name;
+              }
+            }
+          }
           for (const file of fs.readdirSync(datePath).filter(f => f.endsWith('.md'))) {
             const issueId = resolveIssueId(file);
             if (!issueId) continue;
             const content = fs.readFileSync(path.join(datePath, file), 'utf-8');
-            entries.push({ date: issueId, version, ...parseSourceDiff(content) });
+            entries.push({ date: issueId, version, title: issueTitleMap[issueId] ?? null, ...parseSourceDiff(content) });
           }
         }
 
