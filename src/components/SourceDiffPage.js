@@ -61,6 +61,58 @@ function parseSideBySide(diffText) {
   return result;
 }
 
+// ── Copy pane code to clipboard ───────────────────────────────────────────────
+
+const CopyIcon = () => (
+  <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" aria-hidden="true">
+    <rect x="9" y="9" width="13" height="13" rx="2"/>
+    <path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"/>
+  </svg>
+);
+
+const CheckIcon = () => (
+  <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" aria-hidden="true">
+    <path d="M20 6 9 17l-5-5"/>
+  </svg>
+);
+
+// clipboard API 거부 환경(권한 미허용 등) 대비 폴백
+function fallbackCopy(text) {
+  const ta = document.createElement('textarea');
+  ta.value = text;
+  ta.style.position = 'fixed';
+  ta.style.opacity = '0';
+  document.body.appendChild(ta);
+  ta.select();
+  document.execCommand('copy');
+  document.body.removeChild(ta);
+}
+
+function CopyButton({ rows }) {
+  const [copied, setCopied] = useState(false);
+  const handleCopy = async () => {
+    const text = rows.filter(Boolean).map((r) => r.text).join('\n');
+    try {
+      await navigator.clipboard.writeText(text);
+    } catch {
+      fallbackCopy(text);
+    }
+    setCopied(true);
+    setTimeout(() => setCopied(false), 1500);
+  };
+  return (
+    <button
+      type="button"
+      className={`pw-diff-pane__copy${copied ? ' pw-diff-pane__copy--copied' : ''}`}
+      onClick={handleCopy}
+      title="코드 복사"
+    >
+      {copied ? <CheckIcon /> : <CopyIcon />}
+      {copied ? '복사됨' : '복사'}
+    </button>
+  );
+}
+
 // ── One code pane (before / after) ───────────────────────────────────────────
 
 function DiffPane({ label, labelCls, filePath, rows, side }) {
@@ -70,6 +122,7 @@ function DiffPane({ label, labelCls, filePath, rows, side }) {
       <div className="pw-diff-pane__header">
         <span className={`pw-diff-pane__label ${labelCls}`}>{label}</span>
         <span className="pw-diff-pane__path">{fileName}</span>
+        <CopyButton rows={rows} />
       </div>
       <div className="pw-diff-pane__code">
         <table className="hljs-ln">

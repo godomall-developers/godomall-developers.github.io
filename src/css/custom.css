@@ -1061,6 +1061,31 @@ body:has(.diff-viewer) .container {
   overflow: hidden;
   text-overflow: ellipsis;
 }
+.pw-diff-pane__copy {
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+  margin-left: auto;
+  height: 22px;
+  padding: 0 8px;
+  border: 1px solid #3B4048;
+  border-radius: 4px;
+  background: transparent;
+  color: #9DA5B4;
+  font-size: 11px;
+  cursor: pointer;
+  white-space: nowrap;
+  transition: color .15s, border-color .15s, background .15s;
+}
+.pw-diff-pane__copy:hover {
+  color: #D7DAE0;
+  border-color: #5C6370;
+  background: #2C313A;
+}
+.pw-diff-pane__copy--copied {
+  color: #98C379;
+  border-color: rgba(152,195,121,.5);
+}
 .pw-diff-pane__code {
   margin: 0;
   background: #282C34;
