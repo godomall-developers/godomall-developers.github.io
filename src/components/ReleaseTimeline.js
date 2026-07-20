@@ -51,7 +51,9 @@ function PatchItem({ name, descs, diffPath }) {
         {secure ? <ShieldIcon /> : <GearIcon />}
       </span>
       <span className="dc-patch-item__body">
-        <span className="dc-patch-item__name">{name}</span>
+        <span className="dc-patch-item__name-row">
+          <span className="dc-patch-item__name">{name}</span>
+        </span>
         {descs && descs.map((desc, i) => (
           <span key={i} className="dc-patch-item__desc">{desc}</span>
         ))}
@@ -150,9 +152,13 @@ export default function ReleaseTimeline({ title, version, months }) {
       </header>
 
       <main className="dc-timeline-wrap">
-        {months.map((month) => (
-          <MonthGroup key={month.label} label={month.label} dates={month.dates} />
-        ))}
+        {months.length === 0 ? (
+          <div className="dc-filter-empty">해당 유형의 패치 내역이 없습니다.</div>
+        ) : (
+          months.map((month) => (
+            <MonthGroup key={month.label} label={month.label} dates={month.dates} />
+          ))
+        )}
       </main>
     </>
   );

@@ -2,6 +2,12 @@ import React, { useState } from 'react';
 import Layout from '@theme/Layout';
 import Link from '@docusaurus/Link';
 
+const VERSION_LABELS = {
+  '725': 'PHP 7 · GODO25',
+  '825': 'PHP 8 · GODO25',
+  '826': 'PHP 8 · GODO26',
+};
+
 // ── Unified diff → side-by-side pairs ────────────────────────────────────────
 // Returns Array<{ before: Line|null, after: Line|null }>
 // Line = { lineNo: number, text: string, type: 'context'|'removed'|'added' }
@@ -149,7 +155,7 @@ const ChevronRight = () => (
 // ── Shared page header ────────────────────────────────────────────────────────
 
 function PageHeader({ version, date, subtitle, title }) {
-  const versionLabel   = version === 'godo25' ? 'GODO 25' : 'GODO 26';
+  const versionLabel   = VERSION_LABELS[version] ?? version;
   const releaseNotesTo = `/release-notes-${version}`;
   const displayTitle   = title || '소스 변경 전체 보기';
   return (
@@ -273,7 +279,7 @@ function FileListSidebar({ totalCount, files }) {
 
 function SingleDiffPage({ pageData }) {
   const { date, version, fileCount, files, diffs, title } = pageData;
-  const versionLabel = version === 'godo25' ? 'GODO 25' : 'GODO 26';
+  const versionLabel = VERSION_LABELS[version] ?? version;
 
   const sidebarFiles = files.map((f, i) => ({ ...f, anchorId: `file-${i}` }));
   const totalCount   = fileCount;
@@ -310,7 +316,7 @@ function SingleDiffPage({ pageData }) {
 
 function CombinedDiffPage({ pageData }) {
   const { date, version, items } = pageData;
-  const versionLabel = version === 'godo25' ? 'GODO 25' : 'GODO 26';
+  const versionLabel = VERSION_LABELS[version] ?? version;
 
   const totalCount = items.reduce((sum, item) => sum + (item.fileCount || 0), 0);
   const [collapsed, setCollapsed] = useState(false);

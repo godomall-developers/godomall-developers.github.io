@@ -10,12 +10,16 @@ const ArrowRight = () => (
 
 const sections = [
   {
-    title: '릴리즈노트 (GODO 25)',
-    link: '/release-notes-godo25',
+    title: '릴리즈노트 (PHP 7 · GODO25)',
+    link: '/release-notes-725',
   },
   {
-    title: '릴리즈노트 (GODO 26)',
-    link: '/release-notes-godo26',
+    title: '릴리즈노트 (PHP 8 · GODO25)',
+    link: '/release-notes-825',
+  },
+  {
+    title: '릴리즈노트 (PHP 8 · GODO26)',
+    link: '/release-notes-826',
   },
 ];
 

@@ -76,12 +76,16 @@ function parseGroups(content) {
   return groups;
 }
 
+// ─── 사이트에서 다루는 버전 목록 ─────────────────────────────────────────────
+// 7xx = PHP 7, 8xx = PHP 8, 뒤 두 자리 = 고도몰 버전 (예: 825 = PHP 8 · GODO25)
+const VERSIONS = ['725', '825', '826'];
+
 // ─── 이슈 diff 파일에서 issueId 추출 ─────────────────────────────────────────
 // {issueId}.md 또는 SOURCE_DIFF-{version}-{issueId}.md → issueId
 // 날짜 전체용 파일(all.md, SOURCE_DIFF-{version}.md)은 null 반환
 function resolveIssueId(file) {
   if (/^\d+\.md$/.test(file)) return file.replace('.md', '');
-  const m = file.match(/^SOURCE_DIFF-godo\d+-(\d+)\.md$/i);
+  const m = file.match(/^SOURCE_DIFF-(?:godo)?\d+-(\d+)\.md$/i);
   return m ? m[1] : null;
 }
 
@@ -91,12 +95,12 @@ async function sourceDiffDataPlugin(context) {
   return {
     name: 'source-diff-data',
     getPathsToWatch() {
-      return ['godo25', 'godo26'].map(v =>
+      return VERSIONS.map(v =>
         path.join(context.siteDir, 'docs', `source-diff-${v}`, '**', '*.md'),
       );
     },
     async loadContent() {
-      const versions = ['godo25', 'godo26'];
+      const versions = VERSIONS;
       const data = {};
       for (const version of versions) {
         const dir = path.join(context.siteDir, 'docs', `source-diff-${version}`);
@@ -174,13 +178,13 @@ async function releaseNotesDataPlugin(context) {
   return {
     name: 'release-notes-data',
     getPathsToWatch() {
-      return ['godo25', 'godo26'].flatMap(v => [
+      return VERSIONS.flatMap(v => [
         path.join(context.siteDir, 'docs', `release-notes-${v}`, '*.md'),
         path.join(context.siteDir, 'docs', `source-diff-${v}`, '**', '*.md'),
       ]);
     },
     async loadContent() {
-      const versions = ['godo25', 'godo26'];
+      const versions = VERSIONS;
       const releaseNotes = {};
       const combinedPages = {};
 
@@ -212,12 +216,13 @@ async function releaseNotesDataPlugin(context) {
           // 그룹별 항목 파싱 + 개별 diff 경로 설정
           const groups = parseGroups(content).map(group => ({
             ...group,
-            items: group.items.map(item => ({
-              ...item,
-              diffPath: item.issueId && findIssueDiff(item.issueId)
-                ? `/source-diff-${version}/${item.issueId}`
-                : null,
-            })),
+            items: group.items.map(item => {
+              const diffFile = item.issueId ? findIssueDiff(item.issueId) : null;
+              return {
+                ...item,
+                diffPath: diffFile ? `/source-diff-${version}/${item.issueId}` : null,
+              };
+            }),
           }));
 
           // 날짜별 combined 페이지 구성 (이슈 diff 있는 항목만, 릴리즈노트 순서 유지)
@@ -241,11 +246,7 @@ async function releaseNotesDataPlugin(context) {
 
           releaseNotes[version].push({
             date,
-            diffPath: hasCombined
-              ? `/source-diff-${version}/${date}`
-              : hasLegacy
-                ? `/source-diff-${version}/${date}`
-                : null,
+            diffPath: hasCombined || hasLegacy ? `/source-diff-${version}/${date}` : null,
             groups,
           });
         }
@@ -336,6 +337,22 @@ const config = {
   plugins: [
     releaseNotesDataPlugin,
     sourceDiffDataPlugin,
+    [
+      '@docusaurus/plugin-client-redirects',
+      {
+        // 배포됐던 구 URL(godo25/godo26) 유지용. 빌드 시에만 생성되며 dev 서버에는 적용 안 됨.
+        createRedirects(existingPath) {
+          const legacy = { 825: 'godo25', 826: 'godo26' };
+          for (const [token, old] of Object.entries(legacy)) {
+            const re = new RegExp(`^/(release-notes|source-diff)-${token}(/|$)`);
+            if (re.test(existingPath)) {
+              return [existingPath.replace(`-${token}`, `-${old}`)];
+            }
+          }
+          return undefined;
+        },
+      },
+    ],
   ],
 
   presets: [
@@ -370,8 +387,9 @@ const config = {
             label: '릴리즈노트',
             position: 'left',
             items: [
-              {to: '/release-notes-godo25', label: 'Godo25'},
-              {to: '/release-notes-godo26', label: 'Godo26'},
+              {to: '/release-notes-725', label: 'PHP 7 · GODO25'},
+              {to: '/release-notes-825', label: 'PHP 8 · GODO25'},
+              {to: '/release-notes-826', label: 'PHP 8 · GODO26'},
             ],
           },
         ],

@@ -38,21 +38,28 @@ if (!fs.existsSync(inputPath)) {
 const files = fs.readdirSync(inputPath).filter(f => f.endsWith('.md'));
 let count = 0;
 
+// 구 버전 토큰 → 폴더 토큰. 기존 godo25/godo26 산출물은 PHP 8 기준이었다.
+const LEGACY_VERSION_ALIASES = { godo25: '825', godo26: '826' };
+const resolveVersion = (token) => {
+  const v = token.toLowerCase();
+  return LEGACY_VERSION_ALIASES[v] ?? v;
+};
+
 for (const file of files) {
   let version, destName;
 
   // SOURCE_DIFF-{version}-{issueId}.md → {issueId}.md
-  const issueMatch = file.match(/^SOURCE_DIFF-(godo\d+)-(\d+)\.md$/i);
+  const issueMatch = file.match(/^SOURCE_DIFF-((?:godo)?\d+)-(\d+)\.md$/i);
   if (issueMatch) {
-    version = issueMatch[1].toLowerCase();
+    version = resolveVersion(issueMatch[1]);
     destName = `${issueMatch[2]}.md`;
   }
 
   // SOURCE_DIFF-{version}.md → all.md (이슈번호 없음 = 날짜 전체)
   if (!issueMatch) {
-    const allMatch = file.match(/^SOURCE_DIFF-(godo\d+)\.md$/i);
+    const allMatch = file.match(/^SOURCE_DIFF-((?:godo)?\d+)\.md$/i);
     if (allMatch) {
-      version = allMatch[1].toLowerCase();
+      version = resolveVersion(allMatch[1]);
       destName = 'all.md';
     }
   }
