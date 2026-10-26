@@ -90,10 +90,12 @@ function resolveIssueId(file) {
 }
 
 // ─── 구 이슈 diff URL(/source-diff-{v}/{issueId}) → 날짜 포함 URL 매핑 ─────────
-// 같은 이슈가 여러 날짜에 있으면 최신 날짜로 보낸다.
+// 한 날짜에만 있는 이슈만 리다이렉트한다.
+// 여러 날짜에 있는 이슈는 sourceDiffDataPlugin 이 구 URL에 날짜별 묶음 페이지를 만든다.
 function buildLegacyIssueRedirects(siteDir) {
   const map = {};
   const claimed = new Set();
+  const multiDate = new Set();
   for (const version of VERSIONS) {
     const dir = path.join(siteDir, 'docs', `source-diff-${version}`);
     if (!fs.existsSync(dir)) continue;
@@ -106,11 +108,14 @@ function buildLegacyIssueRedirects(siteDir) {
         const issueId = resolveIssueId(file);
         if (!issueId) continue;
         const oldPath = `/source-diff-${version}/${issueId}`;
-        if (claimed.has(oldPath)) continue;
+        if (claimed.has(oldPath)) { multiDate.add(oldPath); continue; }
         claimed.add(oldPath);
         map[`/source-diff-${version}/${dateDir}/${issueId}`] = oldPath;
       }
     }
+  }
+  for (const [newPath, oldPath] of Object.entries(map)) {
+    if (multiDate.has(oldPath)) delete map[newPath];
   }
   return map;
 }
@@ -129,9 +134,10 @@ async function sourceDiffDataPlugin(context) {
     async loadContent() {
       const versions = VERSIONS;
       const data = {};
+      const issuePages = {};
       for (const version of versions) {
         const dir = path.join(context.siteDir, 'docs', `source-diff-${version}`);
-        if (!fs.existsSync(dir)) { data[version] = []; continue; }
+        if (!fs.existsSync(dir)) { data[version] = []; issuePages[version] = []; continue; }
 
         const entries = [];
 
@@ -159,7 +165,7 @@ async function sourceDiffDataPlugin(context) {
             if (!issueId) continue;
             const content = fs.readFileSync(path.join(datePath, file), 'utf-8');
             // 선배포/본배포처럼 같은 이슈가 여러 날짜에 나올 수 있어 라우트에 날짜를 포함
-            entries.push({ date: issueId, slug: `${dateDir}/${issueId}`, version, title: issueTitleMap[issueId] ?? null, ...parseSourceDiff(content) });
+            entries.push({ date: issueId, slug: `${dateDir}/${issueId}`, releaseDate: dateDir, issueId, version, title: issueTitleMap[issueId] ?? null, ...parseSourceDiff(content) });
           }
         }
 
@@ -175,12 +181,49 @@ async function sourceDiffDataPlugin(context) {
         }
 
         data[version] = entries;
+
+        // 여러 날짜(선배포/본배포)에 걸친 이슈: 구 URL에 날짜순으로 이어 붙인 묶음 페이지
+        const byIssue = {};
+        for (const entry of entries) {
+          if (entry.issueId) (byIssue[entry.issueId] ??= []).push(entry);
+        }
+        issuePages[version] = Object.entries(byIssue)
+          .filter(([, list]) => list.length > 1)
+          .map(([issueId, list]) => {
+            const sorted = [...list].sort((a, b) => a.releaseDate.localeCompare(b.releaseDate));
+            return {
+              date: issueId,
+              version,
+              title: sorted[sorted.length - 1].title,
+              items: sorted.map(e => ({
+                name: e.title ? `${e.releaseDate} · ${e.title}` : e.releaseDate,
+                issueId,
+                fileCount: e.fileCount,
+                files: e.files,
+                diffs: e.diffs,
+              })),
+            };
+          });
       }
-      return data;
+      return { entries: data, issuePages };
     },
     async contentLoaded({ content, actions }) {
       const { addRoute, createData } = actions;
-      for (const [version, entries] of Object.entries(content)) {
+      for (const [version, pages] of Object.entries(content.issuePages)) {
+        for (const pageData of pages) {
+          const dataPath = await createData(
+            `source-diff-issue-${version}-${pageData.date}.json`,
+            JSON.stringify(pageData),
+          );
+          addRoute({
+            path: `/source-diff-${version}/${pageData.date}`,
+            component: '@site/src/components/SourceDiffPage',
+            modules: { pageData: dataPath },
+            exact: true,
+          });
+        }
+      }
+      for (const [version, entries] of Object.entries(content.entries)) {
         for (const entry of entries) {
           const dataPath = await createData(
             `source-diff-${version}-${entry.slug.replace('/', '-')}.json`,

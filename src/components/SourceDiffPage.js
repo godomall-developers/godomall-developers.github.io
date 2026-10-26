@@ -368,15 +368,15 @@ function SingleDiffPage({ pageData }) {
 // ── Combined diff page (전체 보기) ─────────────────────────────────────────────
 
 function CombinedDiffPage({ pageData }) {
-  const { date, version, items } = pageData;
+  const { date, version, items, title } = pageData;
   const versionLabel = VERSION_LABELS[version] ?? version;
 
   const totalCount = items.reduce((sum, item) => sum + (item.fileCount || 0), 0);
   const [collapsed, setCollapsed] = useState(false);
 
   return (
-    <Layout title={`${date} 소스 변경 전체 보기 | ${versionLabel}`}>
-      <PageHeader version={version} date={date} subtitle={`변경 파일 수: ${totalCount}개`} />
+    <Layout title={`${title || date} 소스 변경 전체 보기 | ${versionLabel}`}>
+      <PageHeader version={version} date={date} subtitle={`변경 파일 수: ${totalCount}개`} title={title} />
       <div className="sdv-page-content">
         <div className="dc-split">
 
