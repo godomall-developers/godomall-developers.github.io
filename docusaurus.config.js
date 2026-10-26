@@ -89,6 +89,33 @@ function resolveIssueId(file) {
   return m ? m[1] : null;
 }
 
+// ─── 구 이슈 diff URL(/source-diff-{v}/{issueId}) → 날짜 포함 URL 매핑 ─────────
+// 같은 이슈가 여러 날짜에 있으면 최신 날짜로 보낸다.
+function buildLegacyIssueRedirects(siteDir) {
+  const map = {};
+  const claimed = new Set();
+  for (const version of VERSIONS) {
+    const dir = path.join(siteDir, 'docs', `source-diff-${version}`);
+    if (!fs.existsSync(dir)) continue;
+    const dateDirs = fs.readdirSync(dir)
+      .filter(f => /^\d{4}-\d{2}-\d{2}$/.test(f))
+      .filter(f => fs.statSync(path.join(dir, f)).isDirectory())
+      .sort().reverse();
+    for (const dateDir of dateDirs) {
+      for (const file of fs.readdirSync(path.join(dir, dateDir))) {
+        const issueId = resolveIssueId(file);
+        if (!issueId) continue;
+        const oldPath = `/source-diff-${version}/${issueId}`;
+        if (claimed.has(oldPath)) continue;
+        claimed.add(oldPath);
+        map[`/source-diff-${version}/${dateDir}/${issueId}`] = oldPath;
+      }
+    }
+  }
+  return map;
+}
+const LEGACY_ISSUE_REDIRECTS = buildLegacyIssueRedirects(path.resolve('.'));
+
 // ─── 소스 diff 데이터 플러그인 (개별 이슈 라우트 전용) ─────────────────────────
 // 날짜별 전체 보기 라우트는 releaseNotesDataPlugin 이 담당
 async function sourceDiffDataPlugin(context) {
@@ -131,7 +158,8 @@ async function sourceDiffDataPlugin(context) {
             const issueId = resolveIssueId(file);
             if (!issueId) continue;
             const content = fs.readFileSync(path.join(datePath, file), 'utf-8');
-            entries.push({ date: issueId, version, title: issueTitleMap[issueId] ?? null, ...parseSourceDiff(content) });
+            // 선배포/본배포처럼 같은 이슈가 여러 날짜에 나올 수 있어 라우트에 날짜를 포함
+            entries.push({ date: issueId, slug: `${dateDir}/${issueId}`, version, title: issueTitleMap[issueId] ?? null, ...parseSourceDiff(content) });
           }
         }
 
@@ -143,7 +171,7 @@ async function sourceDiffDataPlugin(context) {
         for (const file of legacyFiles) {
           const date = file.replace('.md', '');
           const content = fs.readFileSync(path.join(dir, file), 'utf-8');
-          entries.push({ date, version, ...parseSourceDiff(content) });
+          entries.push({ date, slug: date, version, ...parseSourceDiff(content) });
         }
 
         data[version] = entries;
@@ -155,11 +183,11 @@ async function sourceDiffDataPlugin(context) {
       for (const [version, entries] of Object.entries(content)) {
         for (const entry of entries) {
           const dataPath = await createData(
-            `source-diff-${version}-${entry.date}.json`,
+            `source-diff-${version}-${entry.slug.replace('/', '-')}.json`,
             JSON.stringify(entry),
           );
           addRoute({
-            path: `/source-diff-${version}/${entry.date}`,
+            path: `/source-diff-${version}/${entry.slug}`,
             component: '@site/src/components/SourceDiffPage',
             modules: { pageData: dataPath },
             exact: true,
@@ -220,7 +248,7 @@ async function releaseNotesDataPlugin(context) {
               const diffFile = item.issueId ? findIssueDiff(item.issueId) : null;
               return {
                 ...item,
-                diffPath: diffFile ? `/source-diff-${version}/${item.issueId}` : null,
+                diffPath: diffFile ? `/source-diff-${version}/${date}/${item.issueId}` : null,
               };
             }),
           }));
@@ -343,13 +371,16 @@ const config = {
         // 배포됐던 구 URL(godo25/godo26) 유지용. 빌드 시에만 생성되며 dev 서버에는 적용 안 됨.
         createRedirects(existingPath) {
           const legacy = { 825: 'godo25', 826: 'godo26' };
+          const sources = [existingPath];
+          if (LEGACY_ISSUE_REDIRECTS[existingPath]) sources.push(LEGACY_ISSUE_REDIRECTS[existingPath]);
+          const redirects = sources.slice(1);
           for (const [token, old] of Object.entries(legacy)) {
             const re = new RegExp(`^/(release-notes|source-diff)-${token}(/|$)`);
             if (re.test(existingPath)) {
-              return [existingPath.replace(`-${token}`, `-${old}`)];
+              redirects.push(...sources.map(p => p.replace(`-${token}`, `-${old}`)));
             }
           }
-          return undefined;
+          return redirects.length ? redirects : undefined;
         },
       },
     ],
