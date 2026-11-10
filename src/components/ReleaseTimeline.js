@@ -1,5 +1,6 @@
 import React from 'react';
 import Link from '@docusaurus/Link';
+import {useHistory, useLocation} from '@docusaurus/router';
 
 // ─── Icons ────────────────────────────────────────────────────────────────────
 
@@ -41,9 +42,60 @@ function isSecurityItem(name) {
   return SECURITY_RE.test(name);
 }
 
+// ─── Patch type filter ────────────────────────────────────────────────────────
+// patchTypes 는 docusaurus.config.js 의 classifyPatchTypes 가 변경 파일 경로로 채운다.
+
+const PATCH_TYPES = [
+  { key: 'admin', label: '관리자 패치' },
+  { key: 'skin', label: '스킨 패치' },
+];
+const FILTERS = [{ key: 'all', label: '전체' }, ...PATCH_TYPES];
+
+function filterMonths(months, filter) {
+  if (filter === 'all') return months;
+  return months
+    .map((month) => ({
+      ...month,
+      dates: month.dates
+        .map((d) => ({
+          ...d,
+          groups: d.groups
+            .map((g) => ({ ...g, items: g.items.filter((item) => item.patchTypes?.includes(filter)) }))
+            .filter((g) => g.items.length > 0),
+        }))
+        .filter((d) => d.groups.length > 0),
+    }))
+    .filter((month) => month.dates.length > 0);
+}
+
+function PatchTag({ type }) {
+  const def = PATCH_TYPES.find((t) => t.key === type);
+  if (!def) return null;
+  return <span className={`dc-patch-tag dc-patch-tag--${type}`}>{def.label}</span>;
+}
+
+function PatchFilter({ value, onChange }) {
+  return (
+    <div className="dc-patch-filter" role="group" aria-label="패치 유형 모아보기">
+      <span className="dc-patch-filter__label">모아보기</span>
+      {FILTERS.map((f) => (
+        <button
+          key={f.key}
+          type="button"
+          className={`dc-patch-filter__chip${value === f.key ? ' is-active' : ''}`}
+          aria-pressed={value === f.key}
+          onClick={() => onChange(f.key)}
+        >
+          {f.label}
+        </button>
+      ))}
+    </div>
+  );
+}
+
 // ─── Sub-components ───────────────────────────────────────────────────────────
 
-function PatchItem({ name, descs, diffPath }) {
+function PatchItem({ name, descs, diffPath, patchTypes }) {
   const secure = isSecurityItem(name);
   const inner = (
     <>
@@ -53,6 +105,7 @@ function PatchItem({ name, descs, diffPath }) {
       <span className="dc-patch-item__body">
         <span className="dc-patch-item__name-row">
           <span className="dc-patch-item__name">{name}</span>
+          {patchTypes && patchTypes.map((type) => <PatchTag key={type} type={type} />)}
         </span>
         {descs && descs.map((desc, i) => (
           <span key={i} className="dc-patch-item__desc">{desc}</span>
@@ -74,8 +127,12 @@ function PatchItem({ name, descs, diffPath }) {
 }
 
 function DateCard({ date, diffPath, groups }) {
-  const summaryTitle = groups
-    .map((g) => `${g.type} ${g.items.length}건`)
+  const items = groups.flatMap((g) => g.items);
+  const patchCounts = PATCH_TYPES
+    .map((t) => ({ ...t, count: items.filter((item) => item.patchTypes?.includes(t.key)).length }))
+    .filter((t) => t.count > 0)
+    .map((t) => `${t.label} ${t.count}건`);
+  const summaryTitle = [...groups.map((g) => `${g.type} ${g.items.length}건`), ...patchCounts]
     .join(' · ');
   const showGroupLabels = groups.length > 1;
 
@@ -94,7 +151,7 @@ function DateCard({ date, diffPath, groups }) {
             )}
             <ul className="dc-patch-list">
               {group.items.map((item) => (
-                <PatchItem key={item.name} name={item.name} descs={item.descs} diffPath={item.diffPath} />
+                <PatchItem key={item.issueId ?? item.name} name={item.name} descs={item.descs} diffPath={item.diffPath} patchTypes={item.patchTypes} />
               ))}
             </ul>
           </div>
@@ -128,6 +185,20 @@ function MonthGroup({ label, dates }) {
 // ─── Main export ──────────────────────────────────────────────────────────────
 
 export default function ReleaseTimeline({ title, version, months }) {
+  // 선택한 필터를 ?patch= 로 남겨 링크로 공유할 수 있게 한다
+  const location = useLocation();
+  const history = useHistory();
+  const queryValue = new URLSearchParams(location.search).get('patch');
+  const filter = PATCH_TYPES.some((t) => t.key === queryValue) ? queryValue : 'all';
+  const setFilter = (next) => {
+    const params = new URLSearchParams(location.search);
+    if (next === 'all') params.delete('patch');
+    else params.set('patch', next);
+    const search = params.toString();
+    history.replace({ ...location, search: search ? `?${search}` : '' });
+  };
+  const visibleMonths = filterMonths(months, filter);
+
   return (
     <>
       <header className="ncua-page-title">
@@ -146,16 +217,17 @@ export default function ReleaseTimeline({ title, version, months }) {
               <div className="ncua-page-title__title-row">
                 <h1 className="ncua-page-title__title">{title}</h1>
               </div>
+              <PatchFilter value={filter} onChange={setFilter} />
             </div>
           </div>
         </div>
       </header>
 
       <main className="dc-timeline-wrap">
-        {months.length === 0 ? (
+        {visibleMonths.length === 0 ? (
           <div className="dc-filter-empty">해당 유형의 패치 내역이 없습니다.</div>
         ) : (
-          months.map((month) => (
+          visibleMonths.map((month) => (
             <MonthGroup key={month.label} label={month.label} dates={month.dates} />
           ))
         )}

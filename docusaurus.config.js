@@ -76,6 +76,16 @@ function parseGroups(content) {
   return groups;
 }
 
+// ─── 변경 파일 경로로 패치 유형 판정 ─────────────────────────────────────────
+// 관리자 패치: 관리자 스킨(Admin/) 파일이 하나라도 있으면. Controller/Admin/ 은 코어라 제외.
+// 스킨 패치: .html 이거나 data/skin/ 아래 파일이 하나라도 있으면.
+function classifyPatchTypes(files) {
+  const types = [];
+  if (files.some(f => f.path.startsWith('Admin/'))) types.push('admin');
+  if (files.some(f => f.path.endsWith('.html') || f.path.startsWith('data/skin/'))) types.push('skin');
+  return types;
+}
+
 // ─── 사이트에서 다루는 버전 목록 ─────────────────────────────────────────────
 // 7xx = PHP 7, 8xx = PHP 8, 뒤 두 자리 = 고도몰 버전 (예: 825 = PHP 8 · GODO25)
 const VERSIONS = ['725', '825', '826'];
@@ -266,6 +276,9 @@ async function releaseNotesDataPlugin(context) {
               return {
                 ...item,
                 diffPath: diffFile ? `/source-diff-${version}/${item.issueId}` : null,
+                patchTypes: diffFile
+                  ? classifyPatchTypes(parseSourceDiff(fs.readFileSync(diffFile, 'utf-8')).files)
+                  : [],
               };
             }),
           }));

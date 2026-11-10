@@ -644,6 +644,75 @@ details.dc-month-group[open] .dc-month-group__caret {
   gap: 6px;
 }
 
+/* 패치 유형 태그 — 항목명 옆 */
+.dc-patch-tag {
+  display: inline-flex;
+  align-items: center;
+  height: 20px;
+  padding: 0 7px;
+  border-radius: 4px;
+  font-size: 11px;
+  font-weight: 600;
+  line-height: 1;
+  white-space: nowrap;
+  border: 1px solid transparent;
+}
+
+.dc-patch-tag--admin {
+  background: var(--blue-50);
+  border-color: var(--blue-200);
+  color: var(--blue-600);
+}
+
+.dc-patch-tag--skin {
+  background: var(--orange-50);
+  border-color: var(--orange-200);
+  color: var(--orange-600);
+}
+
+/* 모아보기 필터 — 페이지 타이틀 아래 */
+.dc-patch-filter {
+  display: flex;
+  align-items: center;
+  flex-wrap: wrap;
+  gap: 8px;
+  margin-top: 20px;
+}
+
+.dc-patch-filter__label {
+  font-size: 13px;
+  font-weight: 500;
+  color: var(--gray-500);
+  margin-right: 4px;
+}
+
+.dc-patch-filter__chip {
+  display: inline-flex;
+  align-items: center;
+  height: 32px;
+  padding: 0 14px;
+  border: 1px solid var(--gray-200);
+  border-radius: 999px;
+  background: var(--base-white);
+  font-family: inherit;
+  font-size: 13px;
+  font-weight: 500;
+  color: var(--gray-600);
+  cursor: pointer;
+  transition: border-color .15s, color .15s;
+}
+
+.dc-patch-filter__chip:hover {
+  border-color: var(--gray-300);
+  color: var(--gray-700);
+}
+
+.dc-patch-filter__chip.is-active {
+  border-color: var(--gray-700);
+  color: var(--gray-700);
+  font-weight: 700;
+}
+
 .dc-filter-empty {
   padding: 48px 20px;
   text-align: center;
